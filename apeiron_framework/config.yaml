@@ -1,0 +1,26 @@
+kernels:
+
+  - name: krnl_sr_1
+    input_channels: 4
+    output_channels: 4
+    switch_port: 0
+
+  - name: krnl_sr_2
+    input_channels: 4
+    output_channels: 4
+    switch_port: 1
+    
+  - name: krnl_sr_3
+    input_channels: 4
+    output_channels: 4
+    switch_port: 2
+
+  - name: krnl_sr_4
+    input_channels: 4
+    output_channels: 4
+    switch_port: 3
+
+
+config:
+  freq: 100
+  links: 2

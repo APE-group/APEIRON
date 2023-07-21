@@ -1,0 +1,17 @@
+*.log
+.ipcache/
+build
+_tmp_*
+.Xil/
+test.xclbin.*
+*.ltx
+hw_hls/*.xo
+hw_hls/*.xo.compile_summary
+.run
+emconfig/
+emconfig.json
+profile_kernels.csv
+timeline_kernels.csv
+*.protoinst
+*.wcfg
+*.wdb
