@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2022 INFN APE Lab - Sezione di Roma
-# SPDX-License-Identifier: EUPL-1.2
 
 import argparse
 import yaml
@@ -9,23 +7,25 @@ import os
 import shutil
 
 
-def generate_linker_common(filename="vpp_linker.cfg"):
+def generate_linker_common(filename="vpp_linker.cfg", name='', replica=''):
+    if name!='':
+        name = 'nk='+name+':'
+    if replica=='1':
+        replica = ''
+
     out_str='''
-kernel_frequency=0:100|1:100
+kernel_frequency=0:200|1:200
 
 [advanced]
 misc=solution_name=link_project
 
 [connectivity]
-nk=krnl_sr:4
-
-'''
+@NAME@REPLICA
+'''.replace('@NAME',name).replace('@REPLICA',replica)
 
     with open(filename,"w") as f:
         f.write(out_str)
 
-
-#def generate_linker(kernel, in_channels1, in_channels2, out_channels1, out_channels2, filename="vpp_linker.cfg"):
 
 def stream_connect(source, dest, channel='', kchannel='', switch_port=''):
      if 'dispatcher' in source:
@@ -61,7 +61,7 @@ def generate_kernel_cfg(name, dest_dir="hw_hls/autogen"):
 kernel=@NAME@
 
 [hls]
-clock=100000000:@NAME@
+clock=200000000:@NAME@
 
 [advanced]
 misc=solution_name=@NAME@
@@ -104,9 +104,22 @@ void @NAME@(unsigned nevents /*header_stream_t fifo_hdr_in[N_INPUT_CHANNEL]*/,me
 '''.replace('@NCHAN@', str(nchan)).replace('@NAME@', 'aggregator_'+str(nport))
 
     os.makedirs(f'{dest_dir}/{name}', exist_ok=True)
+
     generate_kernel_cfg(name, dest_dir)
     with open(f'{dest_dir}/{name}/{name}.cpp',"w") as f:
         f.write(out_str)
+
+
+
+def check_strings(string1,string2):
+    list1 = string1.split('_')
+    list2 = string2.split('_')
+    for i in range(0, min(len(list1),len(list2))-1):
+        check_true = (list1[i] == list2[i])
+        if check_true == False:
+            break
+
+    return check_true
 
 
 ##############################################
@@ -114,15 +127,26 @@ void @NAME@(unsigned nevents /*header_stream_t fifo_hdr_in[N_INPUT_CHANNEL]*/,me
 ##############################################
 
 config_file = 'config.yaml'
+app_dir = 'dev_apps/'
+autogen_dir = 'hw_hls/autogen'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config', nargs=1, help=f'yaml config file (default {config_file})')
+parser.add_argument('-d', '--target-dir', nargs=1, help=f'referring directory for different apps')
 parser.add_argument('--switch-name', help='print mangled name of the Textarossa switch IP, based on configuration', action='store_true')
 parser.add_argument('--list-autogen', help='dump list of kernels which are going to be generated', action='store_true')
 args = parser.parse_args()
 
+if args.target_dir:
+    app_dir=app_dir+args.target_dir[0]
+    autogen_dir = app_dir+'/'+autogen_dir
+
 if args.config:
-    config_file = args.config[0]
+    if args.target_dir:
+        config_file = app_dir+'/'+args.config[0]
+    else:
+        config_file = args.config[0]
+
 
 with open(config_file) as file:
     params = yaml.safe_load(file)
@@ -130,143 +154,130 @@ with open(config_file) as file:
     config = params['config']
 
 if args.list_autogen:
-	one=0
-	two=0
-	for k in kernels:
-			if one==0 or (one==1 and two==0):
-				print('dispatcher_' + str(k['switch_port']))
-				print('aggregator_' + str(k['switch_port']))
-			if k['switch_port']==1:
-				one=1
-			if k['switch_port']==2:
-				two
-	exit()
+        one=0
+        two=0
+        three=0
+        for k in kernels:
+                        if one==0 or (one==1 and two==0) or (one==1 and two==1 and three==0):
+                                print('dispatcher_' + str(k['switch_port']))
+                                print('aggregator_' + str(k['switch_port']))
+                        if k['switch_port']==1:
+                                one=1
+                        if k['switch_port']==2:
+                                two=1            
+                        if k['switch_port']==3:
+                                three=1
+                            
+        exit()
+
 
 
 req_in_ports = 0
 req_out_ports = 0
+name_replica = ''
+num_replica = 1
 if "links" in config:
     req_out_ports = config['links']
-for k in kernels:
+for index,k in enumerate(kernels):
     if 'switch_port' in k:
         req_in_ports = max(req_in_ports, k['switch_port']+1)
+    if index < len(kernels)-1:
+        check = check_strings(k['name'],kernels[index+1]['name'])
+        if check:
+            name_replica = k['name']
+            num_replica+=1
+
 switch_name = 'TextaRossa_switch_{}in_{}ex'.format(req_in_ports, req_out_ports)
 if args.switch_name:
     print(switch_name)
     exit()
 
 
-generate_linker_common()
-in_channels0=0
-in_channels1=0
-in_channels2=0
-in_channels3=0
-out_channels0=0
-out_channels1=0
-out_channels2=0
-out_channels3=0
+string_list=name_replica.split('_')
+name=''
+for i in range(0,len(string_list)-1):
+    name+=string_list[i]
+    if(i < len(string_list)-2):
+        name+='_'
+
+generate_linker_common("vpp_linker.cfg", name, str(num_replica))
+
+in_channels = [0,0,0,0]
+out_channels = [0,0,0,0]
+
 for k in kernels:
-	if k['switch_port']==0:
-		in_channels0+=k['input_channels'];
-		out_channels0+=k['output_channels'];
-	if k['switch_port']==1:
-		in_channels1+=k['input_channels'];
-		out_channels1+=k['output_channels'];
-	if k['switch_port']==2:
-		in_channels2+=k['input_channels'];
-		out_channels2+=k['output_channels']; 
-	if k['switch_port']==3:
-		in_channels3+=k['input_channels'];
-		out_channels3+=k['output_channels'];
+    in_channels[k['switch_port']]+=k['input_channels']
+    out_channels[k['switch_port']]+=k['output_channels']
 
 print('Generating dispatcher/aggregator for kernel {}'.format(k['name']))
 print('Generating a dispatcher with {} output channels...'.format(k['input_channels']))
-generate_dispatcher(0, in_channels0)
-generate_dispatcher(1, in_channels1)
-generate_dispatcher(2, in_channels2)
-generate_dispatcher(3, in_channels3)
-
-print('Generating an aggregator with {} input channels...'.format(k['output_channels']))
-generate_aggregator(0, out_channels0)
-generate_aggregator(1, out_channels1)
-generate_aggregator(2, out_channels2)
-generate_aggregator(3, out_channels3)
+for i in range(0,req_in_ports):
+    generate_dispatcher(i, in_channels[i], autogen_dir)
+    generate_aggregator(i, out_channels[i], autogen_dir)
 
 port=999
 filename="vpp_linker.cfg"
-inn=0
-outt=0
-for k in kernels:
-	print('Generating linker...')
-	#generate_linker(k, in_channels1, in_channels2, out_channels1, out_channels2)
-	
-	krnl_name = k['name']
-	dispatcher_name = 'dispatcher_' + str(k['switch_port'])
-	aggregator_name = 'aggregator_' + str(k['switch_port'])
-	output_channels = k['output_channels']
-	input_channels = k['input_channels']
+input_counter=0
+output_counter=0
+for index,k in enumerate(kernels):
+    print('Generating linker...')
+    
+    krnl_name = k['name']
+    dispatcher_name = 'dispatcher_' + str(k['switch_port'])
+    aggregator_name = 'aggregator_' + str(k['switch_port'])
+    output_channels = k['output_channels']
+    input_channels = k['input_channels']
 
-    #if output_channels < 1 or input_channels < 1:
-     #   print("ERROR on channels number!")
-      #  return
 
-	out_str = ''
-	if k['switch_port']!= port:
-   		out_str += stream_connect('TextaRossa_switch', dispatcher_name, switch_port=k['switch_port'])
-   		out_str += stream_connect(aggregator_name, 'TextaRossa_switch', switch_port=k['switch_port'])
-   		port=k['switch_port']
-   		if k['switch_port']== 0:
-   			inn=0
-   			outt=0
-   		elif k['switch_port']== 1:
-   			inn=0
-   			outt=0
-   		elif k['switch_port']== 2:
-   			inn=0
-   			outt=0     
-   		elif k['switch_port']== 3:
-   			inn=0
-   			outt=0
+    if(index < len(kernels)-1):
+        same = (k['switch_port'] == kernels[index+1]['switch_port']) and (((k['output_channels'] == kernels[index+1]['output_channels'])) or ((k['input_channels'] == kernels[index+1]['input_channels']))) 
 
-	if input_channels == 1:
-			if(port!=0):
-			 out_str += stream_connect(dispatcher_name, krnl_name,channel=f'_{inn}')
-			else:
-			 out_str += stream_connect(dispatcher_name, krnl_name)
-			inn+=1;
-        #out_str+='stream_connect=dispatcher_1.fifo_data_out:krnl_enea_1.message_data_in\n'
-        #out_str+='stream_connect=dispatcher_1.fifo_hdr_out:krnl_enea_1.message_hdr_in\n'
-	elif input_channels == 0:
- 	 	 	print('ZERO');
-	else:
-			for n in range(0,input_channels):
-							out_str += stream_connect(dispatcher_name, krnl_name, channel=f'_{inn}', kchannel=f'_{n}')
-							inn+=1
 
-           
-	out_str+='\n'
+    out_str = ''
+    if k['switch_port'] != port:
+        out_str += stream_connect('TextaRossa_switch', dispatcher_name, switch_port=k['switch_port'])
+        out_str += stream_connect(aggregator_name, 'TextaRossa_switch', switch_port=k['switch_port'])
+        input_counter=0
+        output_counter=0
+        port = k['switch_port']
 
-	if output_channels == 1:
-        	if(port!=0):
-        		out_str += stream_connect(krnl_name, aggregator_name, channel=f'_{outt}')
-        	else:
-        		out_str += stream_connect(krnl_name, aggregator_name)
-        	outt+=1
-       
-	elif output_channels == 0:
-    	   print('ZERO');
-	else:
-			for n in range(outt,output_channels+outt):
-							out_str += stream_connect(krnl_name, aggregator_name, channel=f'_{outt}', kchannel=f'_{n}')
-							outt+=1
-			
-	
-	with open(filename,"a") as f:
-			f.write(out_str)
+    if input_channels == 1:
+        if(same == False):
+            out_str += stream_connect(dispatcher_name, krnl_name)
+        else:
+            out_str += stream_connect(dispatcher_name, krnl_name, channel=f'_{input_counter}')
+            input_counter+=1
+
+    elif input_channels > 1:
+        for n in range(0, input_channels):
+            out_str += stream_connect(dispatcher_name, krnl_name, channel=f'_{input_counter}', kchannel=f'_{n}')
+            input_counter+=1
+
+
+    if output_channels == 1:
+        if(same == False):
+            out_str += stream_connect(krnl_name,aggregator_name)
+        else:
+            out_str += stream_connect(krnl_name, aggregator_name, channel=f'_{output_counter}')
+            output_counter+=1
+    elif output_channels > 1:
+        for n in range(0, output_channels):
+            out_str += stream_connect(krnl_name, aggregator_name, channel=f'_{output_counter}', kchannel=f'_{n}')
+            output_counter+=1
+
+    
+    with open(filename,"a") as f:
+        f.write(out_str)
 
 
 print('Copying switch IP with {} input and {} output ports'.format(req_in_ports, req_out_ports))
 os.makedirs('hw_hdl', exist_ok=True)
 shutil.copyfile('ip_repo/{}.xo'.format(switch_name), 'hw_hdl/{}.xo'.format(switch_name))
+
+
+
+
+
+
 
 

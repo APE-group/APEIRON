@@ -72,7 +72,7 @@ std::vector<std::string> read_registers(){
 }
 
 
-xrt::ip kswitch_thread;
+xrt::ip* kswitch_thread;
 bool kill = false;
 
 void *thr_func(void *arg) {
@@ -83,7 +83,7 @@ void *thr_func(void *arg) {
 	std::getchar();
   for (int i=0;i<133;i++){
   		 if(i==0) std::printf("****************** FROM THREAD *********************\n");
-       std::cout << "REGISTER: "<< std::dec << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  (kswitch_thread).read_register(i*4) <<" \t 0x"<< std::hex <<(kswitch_thread).read_register(i*4)<< std::dec <<"\t"<< regs.at(i) << "\n";
+       std::cout << "REGISTER: "<< std::dec << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch_thread->read_register(i*4) <<" \t 0x"<< std::hex << kswitch_thread->read_register(i*4)<< std::dec <<"\t"<< regs.at(i) << "\n";
    }
    }
    

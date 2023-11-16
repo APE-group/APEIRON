@@ -12,32 +12,14 @@
 #include <xrt/xrt_bo.h>
 #include <xrt/xrt_kernel.h>
 #include <experimental/xrt_ip.h>
+#include <experimental/xrt_profile.h>
+#include <experimental/xrt_system.h>
 #include "read_registers.hpp"
 
 #include <pthread.h>
 #define INTERNAL_GENERATOR 0
 #define CABLE_LOOPBACK 0
 #define CONSUMER 0
-/*
-xrt::ip kswitch_thread;
-bool kill = false;
-
-
-//Thread able to print Switch's registers during the execution (useful in case of main thread crash)
-void *thr_func(void *arg) {
-  //xrt::ip krnl_handler(device, uuid_thread, "TextaRossa_switch");
-  while(!kill){
-  std::printf("Thread started ==> Press a key to print registers\n");
-        std::getchar();
-  for (int i=4;i<134;i++){
-                 if(i==4) std::printf("****************** FROM THREAD *********************\n");
-      std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  (kswitch_thread).read_register(i*4) << std::hex <<" \t 0x" << (kswitch_thread).read_register(i*4)<<std::dec << "\n";
-   }
-   }
-   
-  pthread_exit(NULL);
-}
-*/
 
 
 // Elapsed Time function 
@@ -99,11 +81,11 @@ int main(int argc, char** argv)
 	unsigned bram = 0;
 	unsigned packet_size = PACKET_SIZE;
 	unsigned npackets = NPACKETS;
-	unsigned start_port = 0;
 	unsigned dest_task_id = 0;
 	unsigned xdest = 0;
-	unsigned status = 4;
+	unsigned status = 0;
 	unsigned local_coord = 0;
+	unsigned start_port = 0;
 
 	//Flags getting values
 	while (1) {
@@ -138,8 +120,8 @@ int main(int argc, char** argv)
 				start_port = atoi(optarg);
 				break;
 			case 'c':
-        			local_coord = 1;
-        			break;
+            local_coord = 1;
+            break;
 			case 'h':
 				print_usage(argv[0]);
 				exit(EXIT_SUCCESS);
@@ -155,10 +137,43 @@ int main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
-//	size_t buf_size =  (npackets*((local_coord)%2)+1*(local_coord+1%2)) * (packet_size ); //buffer size def
+	//local_coord = (xdest+1)%2;
+	//if(local_coord == 1){
+	  //     	status = 1;
+				//	bram = 1;
+	//}
 
-	size_t buf_size =  npackets * packet_size; //buffer size def
-	xrt::device device(0); //device initialization
+	size_t buf_size;
+	if(packet_size%16==0) buf_size = npackets * packet_size; 
+	else buf_size =  npackets * (packet_size/16+1)*16; //buffer size definition
+	
+	// Create a user_range using the shortcut constructor.  This will
+	//  start measuring the time immediately	
+	xrt::profile::user_range range("Phase 1", "Start of execution to context creation");
+	
+	xrt::profile::user_event events;
+
+
+	unsigned ndevices = xrt::system::enumerate_devices();
+	if (ndevices == 0) {
+		std::cerr << "no device found\n";
+		exit(EXIT_FAILURE);
+	}
+
+	xrt::device device;
+	bool device_found = false;
+	for (unsigned d=0; d<ndevices; ++d) {
+		device = xrt::device(d);
+		if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_base_2") { // TODO: board name as command line argument
+			device_found = true;
+			break;
+		}
+	}
+
+	if (!device_found) {
+		std::cerr << "Device xilinx_u200_gen3x16_xdma_base_2 not found\n";
+		exit(EXIT_FAILURE);
+	}
 	
 	if(!quiet){
 		std::cout << "Device name: " << device.get_info<xrt::info::device::name>() << std::endl;
@@ -172,7 +187,7 @@ int main(int argc, char** argv)
 	xrt::uuid uuid = device.load_xclbin(bitstream); //bitstream flashed
 	
 	xrt::ip kswitch(device, uuid, "TextaRossa_switch"); //ip Switch handle 
-	kswitch_thread = kswitch; //ip handle for parallel thread 
+	kswitch_thread = &kswitch; //ip handle for parallel thread
 	
 	xrt::kernel krnl_sender_receiver; //kernel handle
 	xrt::kernel krnl_sender_receiver2;
@@ -189,11 +204,17 @@ int main(int argc, char** argv)
   		else if(dest_task_id==3) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_4}");
   }
 	
+	range.end();
+	events.mark("Context created, Xclbin flashed and kernel instantiated");
+
+
+	range.start("Phase 2","Buffer creation");
+
 	//Receive buffer intialization
-	
 	xrt::bo recv_buffer(device, buf_size, krnl_sender_receiver.group_id(6));
 	stream_data_t *recv_buffer_map = recv_buffer.map<stream_data_t*>();
 	memset(recv_buffer_map, 0, buf_size);
+
 
 	//Send buffer initialization
 	xrt::bo send_buffer(device, packet_size, krnl_sender_receiver.group_id(5));
@@ -203,12 +224,9 @@ int main(int argc, char** argv)
   		send_buffer_map[i].low=i;
   		send_buffer_map[i].high=i+1;
   	}
-
-	if(bram==0 && status!=3) send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE); //HOST-DDR SYNC (disabled for BRAM tests)
-	
-
+ 	
 	if(!quiet){
-		for (int i=26;i<134;i++){
+		for (int i=26;i<36;i++){
 			std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
 		}
 		std::printf("Press a key to continue\n");
@@ -218,89 +236,94 @@ int main(int argc, char** argv)
 	if(!quiet) std::printf("Resetting switch\n");
 	kswitch.write_register(4*4, 0x1); // auto-toggle reset
 	sleep(1);
-	
 	if(!quiet){
 		for (int i=26;i<36;i++){
         	std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
       }
 	}
 	
+	range.end();
+	events.mark("Buffers allocated");
+
+	range.start("Phase 3","Registers reset, kernel running");
+
+
 	kswitch.write_register(6*4, local_coord); //3D coordinate
 	
 
-	if(CABLE_LOOPBACK) kswitch.write_register(68*4, 0x00030000); // overwrite destination (needed for cable loopback)
+//	kswitch.write_register(68*4, 0x00030000); // overwrite destination (needed for cable loopback)
 	kswitch.write_register(69*4, 0x01800060); // threshold
 	kswitch.write_register(70*4, 0x0000ff40); // new credit cycle
 	if(!quiet) std::printf("CHANNEL_UP: %x\n", kswitch.read_register(67*4));
 
 	//Register Thread start
 	if(!quiet){
-		int s = pthread_create(&thread_registers, NULL, thr_func, NULL);
+	       	int s = pthread_create(&thread_registers, NULL, thr_func, NULL);
 		if(s){
 			std::cout<<"Error in thread creation"<<std::endl;
 			return EXIT_FAILURE;
 		}
 	}
 	
-	if(!quiet) std::printf("Running receiver kernel ...\n");
-	gettimeofday(&startTime,NULL);
-	if(bram==0 && status!=3) send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE); //HOST-DDR SYNC (disabled for BRAM tests)
-	
-	xrt::run krnl_sender_receiver_run2;
-	xrt::run krnl_sender_receiver_run;
-
-
-	
-	if (INTERNAL_GENERATOR && local_coord == 0) {
+	if (INTERNAL_GENERATOR) {
                unsigned tmp = npackets + (packet_size << 16);
                kswitch.write_register(14*4, tmp);
 
-               if(CABLE_LOOPBACK) kswitch.write_register(16*4, 0x00000001);
+               //if(cable_loopback) kswitch.write_register(16*4, 0x00000001);
                std::printf("Starting packet generator ...\n");
 
                kswitch.write_register(12*4, 0x00000101);
-	       		 //kswitch.write_register(16*4, 0x00000001);
 
                sleep(1);
-               //std::printf("Test ok: %x\n",kswitch.read_register(20*4)); // Tet_ok bi
-               //std::printf("Clock cycle: %u\n", kswitch.read_register(22*4));
-               //exit(0);
-	 
-	 						krnl_sender_receiver_run = krnl_sender_receiver(xdest, dest_task_id, npackets, npackets, packet_size, send_buffer, recv_buffer, bram, status);
-	 						
-    	}
-    	
+               std::printf("Test ok: %x\n",kswitch.read_register(20*4)); // Tet_ok bi
+               std::printf("Clock cycle: %u\n", kswitch.read_register(22*4));
+               exit(0);
+       }
 	else{
-		if(local_coord==1 || (xdest==0 && start_port!=dest_task_id)) krnl_sender_receiver_run2 = krnl_sender_receiver2(xdest, start_port, 1, npackets, packet_size, NULL, NULL, 1, 5);
-		if(local_coord==0 || xdest==1) krnl_sender_receiver_run = krnl_sender_receiver(xdest, dest_task_id, npackets*((local_coord+1)%2)+1*(local_coord%2), npackets*(local_coord%2)+1*(local_coord+1)%2, packet_size, send_buffer, recv_buffer, bram, status);
-	}
+
+	if(!quiet) std::printf("Running receiver kernel ...\n");
+	gettimeofday(&startTime,NULL);
+	if(bram==0 && status!=3) send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+	
+	xrt::run krnl_sender_receiver_run;
+	xrt::run krnl_sender_receiver_run2;
+	if(local_coord==1 || (xdest==0 && start_port!=dest_task_id))	krnl_sender_receiver_run2 = krnl_sender_receiver2(xdest, start_port, npackets, npackets, packet_size, NULL, NULL, 1, 1);
+	
+	if(local_coord==0 || xdest==1) krnl_sender_receiver_run = krnl_sender_receiver(xdest, dest_task_id, npackets, npackets, packet_size, send_buffer, recv_buffer, bram, status);
 
 	if(!quiet) std::printf("Waiting for receiver kernel to complete ...\n");
+	
 	if(local_coord==1 || (xdest==0 && start_port!=dest_task_id)) krnl_sender_receiver_run2.wait();
-	if(local_coord==0 || xdest==1){
-		krnl_sender_receiver_run.wait();
-		if(bram==0 && status!=2) recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-	}
+	if(local_coord==0 || xdest==1) krnl_sender_receiver_run.wait();
+	if(bram==0 && status!=2) recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 	gettimeofday(&endTime,NULL);
 	if(!quiet){
 		std::printf("Printing output:\n");
 		for (unsigned i=0; i < buf_size/sizeof(stream_data_t); ++i) {
-			//std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), recv_buffer_map[i].high, recv_buffer_map[i].low);
+			std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), recv_buffer_map[i].high, recv_buffer_map[i].low);
 		}
 	}
+
 	double elapsedTime = elapsed(startTime,endTime);
-	if(!quiet){
-  	std::cout<<"Bandwidth: "<<((npackets+4)*packet_size)/elapsedTime<<" MB/s"<<std::endl;
-		std::cout<<"Latency: "<<elapsedTime/(2*npackets)<<" us"<<std::endl;
-		std::cout<<"Elapsed time: "<<elapsedTime<<" us"<<std::endl;
+	if(local_coord == 0){
+		//std::cout<<"Bandwidth: "<<(npackets*packet_size)/elapsedTime<<" MB/s"<<std::endl;
+		std::cout<<packet_size<<" \t "<<elapsedTime/(2*npackets)<<std::endl;
+		//std::cout<<"Elapsed time: "<<elapsedTime<<" us"<<std::endl;
 	}
-	else{
-		std::cout<<packet_size<<" \t "<<((npackets+4)*packet_size)/elapsedTime<<std::endl;
+	else std::cout<<"Packets pipelined"<<std::endl;
 	}
 	
-	if(!quiet){
+	range.end();
+	events.mark("End Execution");
+
+   if(!quiet){
+	for (int i=26;i<36+12;i++){
+       		std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
+   }
+   }
    kill = true;
-   pthread_join(thread_registers, NULL);
-	}
+   if(!quiet) pthread_join(thread_registers, NULL);
+   //}
+
 	return 0;
 }

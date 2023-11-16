@@ -5,10 +5,12 @@ TARGET ?= hw
 #TARGET ?= hw_emu
 AUTOGEN_YAML ?= config.yaml
 
+TARGET_APP ?= CNN_apeiron_preprocessing_node
+
 LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS += -std=c++1y -I$(XILINX_XRT)/include -Wall
 
-PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test bandwidth_test1 bandwidth_loopback_test latency_test1 emconfig.json
+PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test host_test emconfig.json 
 
 VPP ?= v++
 VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM)
@@ -21,19 +23,19 @@ CONSTRAINTSTCL ?= $(shell readlink -f ./scripts/textarossa_switch.tcl)
 RM := rm -rf
 
 EMCONFIG_DIR := emconfig
-XO_DIR := hw_hdl
+XO_DIR := dev_apps/$(TARGET_APP)/hw_hdl
 TMP_BUILD_DIR := _tmp_build
 
-HLS_CONFIGS := $(shell find hw_hls -name '*.cfg' -not -path 'hw_hls/autogen/*')
-HLS_AUTOGEN_KERNELS := $(shell ./generate.py --list-autogen)
-HLS_AUTOGEN_CONFIGS := $(foreach k,$(HLS_AUTOGEN_KERNELS), hw_hls/autogen/$(k)/$(k).cfg)
+HLS_CONFIGS := $(shell find dev_apps/$(TARGET_APP)/hw_hls -name '*.cfg' -not -path 'dev_apps/$(TARGET_APP)/hw_hls/autogen/*')
+HLS_AUTOGEN_KERNELS := $(shell ./generate.py -c $(AUTOGEN_YAML) -d $(TARGET_APP) --list-autogen)
+HLS_AUTOGEN_CONFIGS := $(foreach k,$(HLS_AUTOGEN_KERNELS), dev_apps/$(TARGET_APP)/hw_hls/autogen/$(k)/$(k).cfg)
 HLS_AUTOGEN_SRCS := $(patsubst %.cfg,%.cpp,$(HLS_AUTOGEN_CONFIGS))
 HLS_CONFIGS += $(HLS_AUTOGEN_CONFIGS)
-SWITCH_NAME := $(shell ./generate.py --switch-name)
-SWITCH_XO := $(XO_DIR)/$(SWITCH_NAME).xo
+SWITCH_NAME := $(shell ./generate.py  -c $(AUTOGEN_YAML) -d $(TARGET_APP) --switch-name)
+SWITCH_XO := hw_hdl/$(SWITCH_NAME).xo
 
 HLS_OBJECTS := $(patsubst %.cfg,%.xo,$(HLS_CONFIGS))
-RTL_OBJECTS := $(wildcard $(XO_DIR)/*.xo) $(SWITCH_XO)
+RTL_OBJECTS := $(wildcard $(XO_DIR)/*.xo) $(SWITCH_XO) 
 VOBJECTS := $(RTL_OBJECTS) $(HLS_OBJECTS)
 
 ifeq ($(TARGET), hw)
@@ -67,11 +69,11 @@ emconfig.json:
 	mkdir -p $(TMP_BUILD_DIR)
 	$(VPP) $(VPP_FLAGS) $(VPP_CFLAGS) --config $(@:.xo=.cfg) --messageDb $(TMP_BUILD_DIR)/$(notdir $@).mdb -o $@ $<
 
-%: host/%.cpp | sw-req
+%: dev_apps/$(TARGET_APP)/host/%.cpp | sw-req
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-prepare $(HLS_AUTOGEN_CONFIGS) $(HLS_AUTOGEN_SRCS) $(VPP_LINKER_CONFIG) $(SWITCH_XO): $(AUTOGEN_YAML)
-	./generate.py -c $(AUTOGEN_YAML)
+prepare $(HLS_AUTOGEN_CONFIGS) $(HLS_AUTOGEN_SRCS) $(VPP_LINKER_CONFIG) $(SWITCH_XO): dev_apps/$(TARGET_APP)/$(AUTOGEN_YAML)
+	./generate.py -c $(AUTOGEN_YAML) -d $(TARGET_APP)
 	./scripts/update_xo.sh $(SWITCH_XO) $(PLATFORM)
 
 clean:
@@ -84,7 +86,7 @@ clean:
 	$(RM) *.log
 	$(RM) .Xil .ipcache
 	$(RM) profile_kernels.csv timeline_kernels.csv *.protoinst *.wcfg *.wdb
-	$(RM) hw_hls/autogen
+	$(RM) dev_apps/$(TARGET_APP)/hw_hls/autogen
 	$(RM) *.jou
 	$(RM) *.csv
 	$(RM) *.str
@@ -93,4 +95,4 @@ clean:
 
 distclean: clean
 	$(RM) $(PRODUCTS)
-	$(RM) $(XCLBIN_NAME).info $(XCLBIN_NAME).link_summary $(XCLBIN_NAME:.xclbin=.ltx)
+	$(RM) $(XCLBIN_NAME).info $(XCLBIN_NAME).link_summary	$(XCLBIN_NAME:.xclbin=.ltx)

@@ -1,0 +1,20 @@
+kernels:
+
+  - name: krnl_sender_1
+    input_channels: 0
+    output_channels: 1
+    switch_port: 0
+  
+  - name: krnl_receiver_1
+    input_channels: 1
+    output_channels: 0
+    switch_port: 0
+
+  - name: image_sender_1
+    input_channels: 1
+    output_channels: 1
+    switch_port: 1
+   
+config:
+  freq: 100
+  links: 2

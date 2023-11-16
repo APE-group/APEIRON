@@ -1,0 +1,15 @@
+kernels:
+
+  - name: top_nnet_1
+    input_channels: 1
+    output_channels: 1
+    switch_port: 0
+  
+  - name: top_nnet_2
+    input_channels: 1
+    output_channels: 1
+    switch_port: 1
+
+config:
+  freq: 100
+  links: 2
