@@ -1,0 +1,250 @@
+<ENTRY>
+{
+ "thisFile": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.xo.compile_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Thu Nov 23 17:21:23 2023",
+ "timestampMillis": "1700756483501",
+ "buildStep": {
+  "cmdId": "d8e71ccf-4b65-4b2d-b4d3-b0696aae074e",
+  "name": "v++",
+  "logFile": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender.steps.log",
+  "commandLine": "/opt/Xilinx/Vitis/2022.2/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -t hw --platform xilinx_u200_gen3x16_xdma_2_202110_1 -s --temp_dir _tmp_build --log_dir _tmp_build/logs --report_dir _tmp_build/reports -I include --config dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cfg --messageDb _tmp_build/krnl_sender.xo.mdb -o dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.xo dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cpp ",
+  "args": [
+   "-t",
+   "hw",
+   "--platform",
+   "xilinx_u200_gen3x16_xdma_2_202110_1",
+   "-s",
+   "--temp_dir",
+   "_tmp_build",
+   "--log_dir",
+   "_tmp_build/logs",
+   "--report_dir",
+   "_tmp_build/reports",
+   "-I",
+   "include",
+   "--config",
+   "dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cfg",
+   "--messageDb",
+   "_tmp_build/krnl_sender.xo.mdb",
+   "-o",
+   "dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.xo",
+   "dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cpp"
+  ],
+  "iniFiles": [
+   {
+    "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cfg",
+    "content": "platform=xilinx_u200_gen3x16_xdma_1_202110_1\nkernel=krnl_sender\n\nsave-temps=1\nmessageDb=_tmp_kernel_build/krnl_sender.mdb\ntemp_dir=_tmp_kernel_build\nreport_dir=_tmp_kernel_build/reports\nlog_dir=_tmp_kernel_build/logs\n\n[hls]\nclock=100000000:krnl_sender\n\n[advanced]\nmisc=solution_name=krnl_sender\n"
+   }
+  ],
+  "cwd": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Nov 23 17:21:23 2023",
+ "timestampMillis": "1700756483503",
+ "status": {
+  "cmdId": "d8e71ccf-4b65-4b2d-b4d3-b0696aae074e",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Thu Nov 23 17:21:26 2023",
+ "timestampMillis": "1700756486941",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_u200_gen3x16_xdma_2_202110_1.xpfm",
+  "hardwareDsa": "hw.xsa",
+  "platformDirectory": "/opt/xilinx/platforms/xilinx_u200_gen3x16_xdma_2_202110_1",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_COMPILE",
+  "target": "TT_HW",
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "krnl_sender",
+     "file": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.xo",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/dev_apps/CNN_apeiron_preprocessing_node/hw_hls/krnl_sender.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "Vitis V++ Compiler Release 2022.2.1. SW Build 3703708 on 2022-12-08-18:23:43"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Thu Nov 23 17:21:26 2023",
+ "timestampMillis": "1700756486947",
+ "buildStep": {
+  "cmdId": "43ee44b2-2876-41a1-830e-ecc616fe3f24",
+  "name": "vitis_hls",
+  "logFile": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/vitis_hls.log",
+  "commandLine": "vitis_hls -f /apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/krnl_sender.tcl -messageDb vitis_hls.pb",
+  "args": [
+   "vitis_hls",
+   "-f",
+   "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/krnl_sender.tcl",
+   "-messageDb",
+   "vitis_hls.pb"
+  ],
+  "iniFiles": [],
+  "cwd": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Nov 23 17:21:26 2023",
+ "timestampMillis": "1700756486948",
+ "status": {
+  "cmdId": "43ee44b2-2876-41a1-830e-ecc616fe3f24",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517199",
+ "status": {
+  "cmdId": "43ee44b2-2876-41a1-830e-ecc616fe3f24",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517350",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/krnl_sender/solution/.autopilot/db/krnl_sender.design.xml",
+  "name": "krnl_sender",
+  "fileType": "XML",
+  "reportType": "KERNEL_HLS_REPORT",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517350",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/krnl_sender/solution/.autopilot/db/.message_syn.xml",
+  "name": "krnl_sender",
+  "fileType": "XML",
+  "reportType": "KERNEL_HLS_DRC_SYNTHESIS",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517355",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/reports/krnl_sender/hls_reports/krnl_sender_csynth.rpt",
+  "name": "krnl_sender",
+  "fileType": "TEXT",
+  "reportType": "KERNEL_HLS_CSYNTH",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517356",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender/krnl_sender/krnl_sender/solution/syn/report/krnl_sender_csynth.xml",
+  "name": "krnl_sender",
+  "fileType": "XML",
+  "reportType": "KERNEL_HLS_CSYNTH",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517361",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/reports/krnl_sender/system_estimate_krnl_sender.xtxt",
+  "name": "",
+  "fileType": "TEXT",
+  "reportType": "GLOBAL_SYSTEM_ESTIMATE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517454",
+ "status": {
+  "cmdId": "d8e71ccf-4b65-4b2d-b4d3-b0696aae074e",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517460",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/reports/krnl_sender/krnl_sender_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Nov 23 17:21:57 2023",
+ "timestampMillis": "1700756517465",
+ "report": {
+  "path": "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/_tmp_build/krnl_sender_guidance.pb3",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>

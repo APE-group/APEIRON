@@ -44,13 +44,13 @@ void krnl_sender(int nboards, int npackets,  word_t *data, hls::stream<word_t> m
 	unsigned inter_dest = 0;
 	unsigned task_id = 1;
 
-//main_loop:
-//	for (int i=0; i<npackets; ++i){
-//	#pragma HLS pipeline
+main_loop:
+	for (int i=0; i<npackets; ++i){
+	#pragma HLS pipeline
 		//Bit-management of the M2EGP header to obtain event's total_words
-		word_t word_buffer[10];
-		word_buffer[0]=data[0];
-		word_t word = data[0];
+		//word_t word_buffer[10];
+		//word_buffer[0]=data[0];
+		word_t word = data[start];
 		unsigned total_hits = word.range(47, 40);
 		unsigned total_words = total_hits >> 3; // /8
 		reminder = total_hits & 0x7;
@@ -60,14 +60,14 @@ void krnl_sender(int nboards, int npackets,  word_t *data, hls::stream<word_t> m
 		//send() api
 		
 	//	unsigned ch_counter = i % NKERNEL;
-		for(int i=0; i<npackets; ++i){
-#pragma HLS pipeline	
-			unsigned ch_id = i % N_OUTPUT_CHANNELS;
-			send(word_buffer, (total_words+1)*sizeof(word_t), 0, 1, ch_id, message_data_out);
-		}
+		//for(int i=0; i<npackets; ++i){
+//#pragma HLS pipeline	
+		unsigned ch_id = i % N_OUTPUT_CHANNELS;
+		send(data+start, (total_words+1)*sizeof(word_t), 0, 1, ch_id, message_data_out);
+	//	}
 		//RoundRobin(i , inter_dest, nboards, task_id, cu);
 
-		//start+=total_words+1;
+		start+=total_words+1;
 		
 	/*	if(ch_counter == NKERNEL - 1){
 			task_id++;
@@ -78,7 +78,7 @@ void krnl_sender(int nboards, int npackets,  word_t *data, hls::stream<word_t> m
 			}
 		}
 	*/	
-	//}
+	}
 }
 
 }

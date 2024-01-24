@@ -13,8 +13,13 @@ kernels:
   - name: image_sender_1
     input_channels: 1
     output_channels: 1
-    switch_port: 1
-   
+    switch_port: 1 
+
+  - name: top_nnet_1
+    input_channels: 1
+    output_channels: 1
+    switch_port: 2 
+
 config:
   freq: 100
   links: 2

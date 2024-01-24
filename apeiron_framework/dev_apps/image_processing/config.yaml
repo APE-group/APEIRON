@@ -1,0 +1,20 @@
+kernels:
+
+  - name: Memory2RGB_1
+    input_channels: 0
+    output_channels: 3
+    switch_port: 0
+
+  - name: RGB2Memory_1
+    input_channels: 3
+    output_channels: 0
+    switch_port: 0
+ 
+  - name: ImgProc_1
+    input_channels: 3
+    output_channels: 3
+    switch_port: 1
+
+config:
+  freq: 100
+  links: 2

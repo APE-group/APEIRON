@@ -1,0 +1,334 @@
+void setNbImages(unsigned int n, unsigned int &nA, unsigned int &nB)
+
+void setHEdgeDetectWeights(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22)
+
+void setXSobelEdgeDetectWeights(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22)
+						   
+void setYSobelEdgeDetectWeights(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22)
+						   
+void setXYSobelEdgeDetectWeights(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22)
+
+void setHighBoostFiltering(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22,
+						   short int A)
+
+void setVEdgeDetectWeights(short int &c00, short int &c01, short int &c02,
+						   short int &c10, short int &c11, short int &c12,
+						   short int &c20, short int &c21, short int &c22)
+
+void set3x3GaussianFilterWeights( short int &c00, short int &c01, short int &c02,
+							   short int &c10, short int &c11, short int &c12,
+							   short int &c20, short int &c21, short int &c22)
+
+void set5x5GaussianFilterWeights_s_eq_1(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04,
+							   short int &c10, short int &c11, short int &c12, short int &c13, short int &c14,
+							   short int &c20, short int &c21, short int &c22, short int &c23, short int &c24,
+							   short int &c30, short int &c31, short int &c32, short int &c33, short int &c34,
+							   short int &c40, short int &c41, short int &c42, short int &c43, short int &c44)
+
+void set5x5GaussianFilterWeights_s_eq_2(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04,
+							   short int &c10, short int &c11, short int &c12, short int &c13, short int &c14,
+							   short int &c20, short int &c21, short int &c22, short int &c23, short int &c24,
+							   short int &c30, short int &c31, short int &c32, short int &c33, short int &c34,
+							   short int &c40, short int &c41, short int &c42, short int &c43, short int &c44)
+
+void set5x5GaussianFilterWeights_s_eq_3(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04,
+							   short int &c10, short int &c11, short int &c12, short int &c13, short int &c14,
+							   short int &c20, short int &c21, short int &c22, short int &c23, short int &c24,
+							   short int &c30, short int &c31, short int &c32, short int &c33, short int &c34,
+							   short int &c40, short int &c41, short int &c42, short int &c43, short int &c44)
+
+void set5x5AveragingFilterWeights(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04,
+							   short int &c10, short int &c11, short int &c12, short int &c13, short int &c14,
+							   short int &c20, short int &c21, short int &c22, short int &c23, short int &c24,
+							   short int &c30, short int &c31, short int &c32, short int &c33, short int &c34,
+							   short int &c40, short int &c41, short int &c42, short int &c43, short int &c44)
+
+void set7x7GaussianFilterWeights_s_eq_1(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04, short int &c05, short int &c06,
+								short int &c10, short int &c11, short int &c12, short int &c13, short int &c14, short int &c15, short int &c16,
+								short int &c20, short int &c21, short int &c22, short int &c23, short int &c24, short int &c25, short int &c26,
+								short int &c30, short int &c31, short int &c32, short int &c33, short int &c34, short int &c35, short int &c36,
+								short int &c40, short int &c41, short int &c42, short int &c43, short int &c44, short int &c45, short int &c46,
+								short int &c50, short int &c51, short int &c52, short int &c53, short int &c54, short int &c55, short int &c56,
+								short int &c60, short int &c61, short int &c62, short int &c63, short int &c64, short int &c65, short int &c66)
+
+void set7x7GaussianFilterWeights_s_eq_2(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04, short int &c05, short int &c06,
+								short int &c10, short int &c11, short int &c12, short int &c13, short int &c14, short int &c15, short int &c16,
+								short int &c20, short int &c21, short int &c22, short int &c23, short int &c24, short int &c25, short int &c26,
+								short int &c30, short int &c31, short int &c32, short int &c33, short int &c34, short int &c35, short int &c36,
+								short int &c40, short int &c41, short int &c42, short int &c43, short int &c44, short int &c45, short int &c46,
+								short int &c50, short int &c51, short int &c52, short int &c53, short int &c54, short int &c55, short int &c56,
+								short int &c60, short int &c61, short int &c62, short int &c63, short int &c64, short int &c65, short int &c66)
+					
+void set7x7GaussianFilterWeights_s_eq_3(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04, short int &c05, short int &c06,
+								short int &c10, short int &c11, short int &c12, short int &c13, short int &c14, short int &c15, short int &c16,
+								short int &c20, short int &c21, short int &c22, short int &c23, short int &c24, short int &c25, short int &c26,
+								short int &c30, short int &c31, short int &c32, short int &c33, short int &c34, short int &c35, short int &c36,
+								short int &c40, short int &c41, short int &c42, short int &c43, short int &c44, short int &c45, short int &c46,
+								short int &c50, short int &c51, short int &c52, short int &c53, short int &c54, short int &c55, short int &c56,
+								short int &c60, short int &c61, short int &c62, short int &c63, short int &c64, short int &c65, short int &c66)
+
+void set7x7AveragingFilterWeights(short int &c00, short int &c01, short int &c02, short int &c03, short int &c04, short int &c05, short int &c06,
+								short int &c10, short int &c11, short int &c12, short int &c13, short int &c14, short int &c15, short int &c16,
+								short int &c20, short int &c21, short int &c22, short int &c23, short int &c24, short int &c25, short int &c26,
+								short int &c30, short int &c31, short int &c32, short int &c33, short int &c34, short int &c35, short int &c36,
+								short int &c40, short int &c41, short int &c42, short int &c43, short int &c44, short int &c45, short int &c46,
+								short int &c50, short int &c51, short int &c52, short int &c53, short int &c54, short int &c55, short int &c56,
+								short int &c60, short int &c61, short int &c62, short int &c63, short int &c64, short int &c65, short int &c66)
+
+void setReconstructionFilterWeights( short int &c00, short int &c01, short int &c02,
+							   short int &c10, short int &c11, short int &c12,
+							   short int &c20, short int &c21, short int &c22)
+							   
+template <typename T>							   
+static void sinkStream(hls::stream<T>& in_stream,unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>  // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void PassThrough(hls::stream<T>& in_stream,  hls::stream<T>& out_stream1,  unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void streamCopy(hls::stream<T>& in_stream,  hls::stream<T>& out_stream1,  hls::stream<T>& out_stream2, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void streamCopy(hls::stream<T>& in_stream,  hls::stream<T>& os1, hls::stream<T>& os2,  hls::stream<T>& os3, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void streamCopy(hls::stream<T>& in_stream,  hls::stream<T>& os1, hls::stream<T>& os2, hls::stream<T>& os3, hls::stream<T>& os4, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void streamCopy(hls::stream<T>& in_stream,  hls::stream<T>& os1, hls::stream<T>& os2, hls::stream<T>& os3, hls::stream<T>& os4, hls::stream<T>& os5, unsigned int ImgSize, unsigned int NbImages)
+
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void split2Channels(hls::stream<T>& sin, hls::stream<T>& soutA, hls::stream<T>& soutB, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void merge2Channels(hls::stream<T>& sinA, hls::stream<T>& sinB, hls::stream<T>& sout, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void sumImages(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<T>& out_stream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void diffImages(hls::stream<T>& inStream1, hls::stream<T>& inStream2, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, typename Tout, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void mulImages(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<Tout>& out_stream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, typename Tout, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void mulAndSquareImages(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<Tout>& out_I1square, hls::stream<Tout>& out_I1I2, hls::stream<Tout>& out_I2square,  unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, typename Tout, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void determineCornerAndEdges(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream12, hls::stream<T>& in_stream2,  hls::stream<Tout>& out_Img, int RThreshold, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W, typename Tout, int Sout>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void computeR_HarrisCornerDetection(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<T>& in_stream12,  hls::stream<Tout>& out_R, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W, typename Tout, int Sout, int Wout>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void findCornerAndEdges_3x3(hls::stream<T>& inStream,hls::stream<Tout>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols,
+				  int RThreshold,
+				  unsigned int NbImages)
+				  
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void convexSumImages(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<T>& out_stream, unsigned char alpha, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void weightedSumImages(hls::stream<T>& in_stream1,  hls::stream<T>& in_stream2,  hls::stream<T>& out_stream, unsigned char w1, unsigned char w2, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void RGB2Y(hls::stream<T>& sR, hls::stream<T>& sG, hls::stream<T>& sB, hls::stream<T>& outStreamY, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void RGB2YUV(hls::stream<T>& sR, hls::stream<T>& sG, hls::stream<T>& sB, hls::stream<T>& outStreamY, hls::stream<T>& outStreamU, hls::stream<T>& outStreamV, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void YUV2RGB(hls::stream<T>& sY, hls::stream<T>& sU, hls::stream<T>& sV, hls::stream<T>& sR, hls::stream<T>& sG, hls::stream<T>& sB, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void contrastEnhance(T* Mem, hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void imageStoreAndForward(T* Buffer, hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+void buffer(dtx4* mem, hls::stream<dt>& inStream, hls::stream<dt>& outStream, unsigned int bufferSize, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void rotateImage180(T* Buffer, hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void verticalMirrorImage(T* Buffer, hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void decreaseColorDepth(hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned short int NbColorBitsKept, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void convertToBinary(hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned char Th, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void mix2ImagesWithMask(hls::stream<T>& inStream1, hls::stream<T>& inStream2, hls::stream<T>& inStreamMask, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void doNegative(hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void subsampleImageBy2(hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void upsampleImageX2(hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void extractRectangularImage(hls::stream<T>& inStream, hls::stream<T>& outStream,
+		                     short int row, short int col,
+							 unsigned short int length_x, unsigned short int length_y,
+							 unsigned short int ImgRows, unsigned short int ImgCols,
+							 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void insertRectangularImage(hls::stream<T>& inStream1, hls::stream<T>& inStream2, hls::stream<T>& outStream,
+		                     short int row, short int col,
+							 unsigned short int length_x, unsigned short int length_y,
+							 unsigned short int ImgRows, unsigned short int ImgCols,
+							 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void extractRGBRectangularImage(hls::stream<T>& inStream, hls::stream<T>& outStream,
+		                     short int row, short int col,
+							 unsigned short int length_x, unsigned short int length_y,
+							 unsigned short int ImgRows, unsigned short int ImgCols,
+							 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void insertRGBRectangularImage(hls::stream<T>& inStream1, hls::stream<T>& inStream2, hls::stream<T>& outStream,
+		                     short int row, short int col,
+							 unsigned short int length_x, unsigned short int length_y,
+							 unsigned short int ImgRows, unsigned short int ImgCols,
+							 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void drawCircularMask(hls::stream<T>& outStream,
+		                     unsigned short int radius,
+							 unsigned short int x0, unsigned short int y0,
+							 unsigned short int ImgRows, unsigned short int ImgCols,
+							 unsigned int NbImages)
+							 				  
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void linearScaling(hls::stream<T>& inStream, hls::stream<T>& outStream, short int a, short int b, unsigned int ImgSize)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void generateConstantGreyImage(char val, hls::stream<T>& outStream, unsigned int ImgSize,  unsigned int NbImages)
+
+static void splitRGBChannels(hls::stream<dt>& in_stream,  hls::stream<dt>& sR,  hls::stream<dt>& sG,  hls::stream<dt>& sB, unsigned int ImgSize, unsigned int NbImages)
+
+static void mergeRGBChannels(hls::stream<dt>& sR,  hls::stream<dt>& sG,  hls::stream<dt>& sB, hls::stream<dt>& out_stream,  unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+static void memory2Stream(T* in1, hls::stream<T>& inStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   
+void stream2Memory(T* outMem, hls::stream<T>& inStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void bufferedStream2Memory(	T* outMem, hls::stream<T>& inStream, unsigned int ImgSize, unsigned int NbImages)
+							
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_3x3_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols,
+				  short int c00, short int c01, short int c02,
+				  short int c10, short int c11, short int c12,
+				  short int c20, short int c21, short int c22,
+				  bool absVal,
+				  unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_3x3_max_min_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols,
+				  bool computeMax,
+				  unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_5x5_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols,
+				  short int c00, short int c01, short int c02, short int c03, short int c04,
+				  short int c10, short int c11, short int c12, short int c13, short int c14,
+				  short int c20, short int c21, short int c22, short int c23, short int c24,
+				  short int c30, short int c31, short int c32, short int c33, short int c34,
+				  short int c40, short int c41, short int c42, short int c43, short int c44,
+				  bool absVal,
+				  unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_7x7_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols,
+				  short int c00, short int c01, short int c02, short int c03, short int c04, short int c05, short int c06,
+				  short int c10, short int c11, short int c12, short int c13, short int c14, short int c15, short int c16,
+				  short int c20, short int c21, short int c22, short int c23, short int c24, short int c25, short int c26,
+				  short int c30, short int c31, short int c32, short int c33, short int c34, short int c35, short int c36,
+				  short int c40, short int c41, short int c42, short int c43, short int c44, short int c45, short int c46,
+				  short int c50, short int c51, short int c52, short int c53, short int c54, short int c55, short int c56,
+				  short int c60, short int c61, short int c62, short int c63, short int c64, short int c65, short int c66,
+				  bool absVal,
+				  unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void erosion_2x2(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				 unsigned short int ImgRows, unsigned short int ImgCols,
+				 short int c00, short int c01,
+				 short int c10,short int c11,
+  				 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void erosion_3x3(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				 unsigned short int ImgRows, unsigned short int ImgCols,
+				 short int c00, short int c01, short int c02,
+				 short int c10, short int c11, short int c12,
+				 short int c20, short int c21, short int c22,
+  				 unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void dilation_3x3(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				 unsigned short int ImgRows, unsigned short int ImgCols,
+				 short int c00, short int c01, short int c02,
+				 short int c10, short int c11, short int c12,
+				 short int c20, short int c21, short int c22,
+  				 unsigned int NbImages)
+  				 
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void horizontalMirrorImage(hls::stream<T>& inStream,hls::stream<T>& outStream,
+				  	  	  unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_3x3_median_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void do_5x5_median_filtering(hls::stream<T>& inStream,hls::stream<T>& out_stream,
+				  unsigned short int ImgRows, unsigned short int ImgCols, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void histogramEqualization(T* Mem, hls::stream<T>& inStream, hls::stream<T>& outStream, unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void Stream2Memory(T* outMem,
+				   hls::stream<T>& inStream,
+				   unsigned int ImgSize, unsigned int NbImages)
+
+template <typename T, int S, int W>   // S is the size, in bits, of the pixel component. W is the width, in bit, of data type T
+void printStreamToFile(hls::stream<T>& inStream, unsigned int streamId, unsigned int ImgSize, unsigned short int ImgCols, unsigned int NbImages)
+
+void doubleStreamWidth(hls::stream<io_stream_16B>& in_stream,  hls::stream<dt32>& out_stream,  unsigned int ImgSize, unsigned int NbImages)
+					 				  
+void doubleStreamWidth(hls::stream<dt16>& in_stream,  hls::stream<dt32>& out_stream,  unsigned int ImgSize, unsigned int NbImages)
+
+void halveStreamWidth(hls::stream<dt32>& in_stream,  hls::stream<io_stream_16B>& out_stream,  unsigned int ImgSize, unsigned int NbImages)
+
+void halveStreamWidth(hls::stream<dt32>& in_stream,  hls::stream<dt16>& out_stream,  unsigned int ImgSize, unsigned int NbImages)
+				

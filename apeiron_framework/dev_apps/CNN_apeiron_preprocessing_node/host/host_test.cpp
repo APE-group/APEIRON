@@ -15,6 +15,8 @@
 #include <xrt/xrt_bo.h>
 #include <xrt/xrt_kernel.h>
 #include <experimental/xrt_ip.h>
+#include <experimental/xrt_profile.h>
+#include <experimental/xrt_system.h>
 
 
 //Thread able to print Switch's registers during the execution (useful in case of main thread crash)
@@ -27,7 +29,7 @@ void *thr_func(void *arg) {
   std::printf("Thread started ==> Press a key to print registers\n");
 	std::getchar();
 	nreg++;
-  for (int i=4;i<130;i++){
+  for (int i=4;i<99;i++){
   		 if(i==4) std::printf("****************** FROM THREAD *********************\n");
        std::cout << "reg: "<< std::dec << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  (kswitch_thread).read_register(i*4) <<" \t 0x"<< std::hex <<(kswitch_thread).read_register(i*4)<< std::dec << "\n";
    }
@@ -71,7 +73,6 @@ unsigned read_m2egp_file(const char *m2egp_file, std::vector<stream_data_t> &m2e
 	unsigned stride = 0;
 	stream_data_t event = {0};
 
-
 	while(std::getline(infile, line)) {
 		uint64_t d = std::stoul(line, nullptr, 16);
 		if ((d >> 16) == 0xffff) counter++;
@@ -103,7 +104,7 @@ int main(int argc, char** argv)
 	pthread_t thread_registers; //Thread definition
 	char *m2egp_file = NULL;
 	unsigned npackets = 0;
-	unsigned ndevices = 1;
+	unsigned n_devices = 1;
 	unsigned xdest = 0;
 	unsigned local_coord = 0;
 
@@ -124,7 +125,7 @@ int main(int argc, char** argv)
 				npackets = atoi(optarg);
 				break;
 			case 'd':
-				ndevices = atoi(optarg);
+				n_devices = atoi(optarg);
 				break;
 			case 'x':
 				xdest = atoi(optarg);
@@ -147,8 +148,28 @@ int main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 	
-	xrt::device device(0);
+//	xrt::device device(0);
 
+	unsigned ndevices = xrt::system::enumerate_devices();
+	if (ndevices == 0) {
+		std::cerr << "no device found\n";
+		exit(EXIT_FAILURE);
+	}
+
+	xrt::device device;
+	bool device_found = false;
+	for (unsigned d=0; d<ndevices; ++d) {
+		device = xrt::device(d);
+		if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_2_202110_1") { // TODO: board name as command line argument
+			device_found = true;
+			break;
+		}
+	}
+
+	if (!device_found) {
+		std::cerr << "Device xilinx_u200_gen3x16_xdma_base_2 not found\n";
+		exit(EXIT_FAILURE);
+	}
 	std::cout << "Device name: " << device.get_info<xrt::info::device::name>() << std::endl;
 	std::cout << "Device bdf: " << device.get_info<xrt::info::device::bdf>() << std::endl;
 	std::cout << "Device max freq: " << device.get_info<xrt::info::device::max_clock_frequency_mhz>() << std::endl;
@@ -158,19 +179,22 @@ int main(int argc, char** argv)
 
 	xrt::uuid uuid = device.load_xclbin(bitstream);
 	xrt::ip kswitch(device, uuid, "TextaRossa_switch");
+	
 	kswitch_thread = kswitch; //ip handle for parallel thread 
 	
 	if(local_coord == 0){
 		xrt::kernel kreceiver(device, uuid, "krnl_receiver:{krnl_receiver_1}");
 		xrt::kernel ksender(device, uuid, "krnl_sender:{krnl_sender_1}");
+		xrt::kernel image_sender(device, uuid, "image_sender:{image_sender_1}");
 		std::ofstream outfile("data.dat");
 	
 		std::vector<stream_data_t> m2egp;
 		unsigned m2egp_count = 0;
 		//for(int p=0; p < npackets; p++){
-		//m2egp_count += read_m2egp_file("DATA/clop_flow/cloppone_last.dat", m2egp, npackets);
-		m2egp_count += read_m2egp_file("DATA/clop_flow/cloppone_val.dat", m2egp, npackets);
+		//m2egp_count += read_m2egp_file("DATA/clop_flow/cloppone_last.dat", m2egp, p);
+			m2egp_count += read_m2egp_file("/apotto/home1/aliens/rossi/CNN_apeiron/DATA/clop_flow/cloppone_val.dat", m2egp, npackets);
 		//}
+		//
 		std::cout << m2egp_count << " M2EGPs (" << m2egp.size() << " words)" << std::endl;
 		if (!m2egp_count) exit(EXIT_FAILURE);
 
@@ -192,20 +216,17 @@ int main(int argc, char** argv)
   			send_buffer_map[i].low = m2egp[i].low;
   		}
   		for (unsigned i=0; i < inbuf_size/sizeof(stream_data_t); ++i) {
-			//std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), send_buffer_map[i].high, 		send_buffer_map[i].low);
+	//		std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), send_buffer_map[i].high, 		send_buffer_map[i].low);
 			//std::printf("\"0x%.16lx%.16lx\",\n", send_buffer_map[i].high, send_buffer_map[i].low);
 		}
-		//std::cout<<"LOAD DATA ON FPGA"<<std::endl;
 		send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
-	//	std::printf("Press a key to continue\n");
-  //      std::getchar();
 
 		std::printf("Resetting switch\n");
 		kswitch.write_register(4*4, 0x1); // auto-toggle reset
 		sleep(1);
 		kswitch.write_register(6*4, local_coord); // X coordinate
-		//kswitch.write_register(68*4, 0x00030000); // overwrite destination
+//		kswitch.write_register(68*4, 0x00030000); // overwrite destination
 		kswitch.write_register(69*4, 0x01800060); // threshold
 		kswitch.write_register(70*4, 0x0000ff40); // new credit cycle
 		std::printf("CHANNEL_UP: %x\n", kswitch.read_register(67*4));
@@ -217,20 +238,21 @@ int main(int argc, char** argv)
 		}
 		
 
+		xrt::run image_sender_run = image_sender(2,4);
+
 		std::chrono::duration<double, std::nano> deltat;
 	
 		std::printf("Running receiver kernel ...\n");
 		xrt::run kreceiver_run = kreceiver(recv_buffer, m2egp_count);
 
-		std::printf("Starting sender kernel ...\n");
+		std::printf("Starting sender kernel ... \n");
 	
 	
-		xrt::run ksender_run = ksender(ndevices, npackets, send_buffer, 1);
 		auto tstart = std::chrono::high_resolution_clock::now();
+		xrt::run ksender_run = ksender(ndevices, npackets, send_buffer);
 		//std::printf("Waiting for sender kernel to complete ...\n");
-		//ksender_run.wait();
-	
-		//std::printf("Waiting for receiver kernel to complete ...\n");
+	//	ksender_run.wait();
+	//std::printf("Waiting for receiver kernel to complete ...\n");
 		kreceiver_run.wait();
 
 		auto tend = std::chrono::high_resolution_clock::now();
@@ -243,8 +265,8 @@ int main(int argc, char** argv)
 		rings = (float*)calloc(20,sizeof(float));
 		evts = (float*)calloc(5,sizeof(float));
 		for (unsigned i=0; i < m2egp_count; ++i) {
-			//std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), recv_buffer_map[i].high, recv_buffer_map[i].low);
-			outfile<<std::hex<<(recv_buffer_map[i].high>>48)<<recv_buffer_map[i].low<<"\n";
+		//	std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), recv_buffer_map[i].high, recv_buffer_map[i].low);
+	//		outfile<<std::hex<<(recv_buffer_map[i].high>>48)<<recv_buffer_map[i].low<<"\n";
 			auto ring_RECO= (recv_buffer_map[i].high >> 48) & 0xFF;
 			//auto ring_RECO = recv_buffer_map[i].high >> 56;
 			if(ring_RECO>=3) ring_RECO=3;
@@ -262,6 +284,7 @@ int main(int argc, char** argv)
 
 		std::cout<< m2egp_count  << " \t "<< deltat.count()/(m2egp_count ) << "\n";
 	
+
 		
 	
 		std::cout <<"EFFICIENCY CONFUSION MATRIX (N_RINGS) \n";
@@ -280,23 +303,17 @@ int main(int argc, char** argv)
 		outfile.close();
 	 	kill = true;
    	pthread_join(thread_registers, NULL);
-	
 	//free(rings);
 	}
 	else{
 		std::printf("Resetting switch\n");
-		
-		//xrt::kernel kreceiver(device, uuid, "krnl_receiver:{krnl_receiver_1}");
-		
 		kswitch.write_register(4*4, 0x1); // auto-toggle reset
 		sleep(1);
 		kswitch.write_register(6*4, local_coord); // X coordinate
-		//kswitch.write_register(68*4, 0x00030000); // overwrite destination
+//		kswitch.write_register(68*4, 0x00030000); // overwrite destination
 		kswitch.write_register(69*4, 0x01800060); // threshold
 		kswitch.write_register(70*4, 0x0000ff40); // new credit cycle
 		std::printf("CHANNEL_UP: %x\n", kswitch.read_register(67*4));
-		
-		
 
 		int s = pthread_create(&thread_registers, NULL, thr_func, NULL);
 			if(s){
@@ -304,18 +321,6 @@ int main(int argc, char** argv)
 			return EXIT_FAILURE;
 		}
 		
-	//	xrt::bo recv_buffer(device, npackets/3*sizeof(stream_data_t), kreceiver.group_id(0));
-	//	stream_data_t *recv_buffer_map = recv_buffer.map<stream_data_t*>();
-	//	memset(recv_buffer_map, 0,  npackets/3*sizeof(stream_data_t));
-		
-		//xrt::run kreceiver_run = kreceiver(NULL, npackets/3);
-		//kreceiver_run.wait();
-	//	recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-		
-	/*	for (unsigned i=0; i < npackets/3; ++i) {
-			std::printf("0x%.8lx: 0x%.16lx%.16lx\n", i*sizeof(stream_data_t), recv_buffer_map[i].high, recv_buffer_map[i].low);
-		}
-	*/	
 		while(!kill){
 			if(nreg >= 10) kill = true;
 		}

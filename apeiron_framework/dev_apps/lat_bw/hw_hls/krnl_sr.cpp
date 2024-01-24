@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <hls_stream.h>
 #include "ap_axi_sdata.h"
-#include "methods.hpp"
+#include "hapecom.hpp"
 
 
 #define N_OUTPUT_CHANNELS 4

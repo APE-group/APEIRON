@@ -11,16 +11,16 @@
 #include <hls_stream.h>
 
 #include "apenet_packet.h"
-#include "methods.hpp"
+#include "hapecom.hpp"
 #define PRAGMA_SUB(x) _Pragma (#x)
 #define DO_PRAGMA(x) PRAGMA_SUB(x)
 
-typedef ap_uint<128> uint128_t;
-typedef uint128_t word_t;
-typedef hls::stream<uint128_t> message_stream_t;
-typedef hls::stream<apenet_header_t> header_stream_t;
-typedef short channel_id_t;
-typedef short task_id_t;
+//typedef ap_uint<128> word_t;
+//typedef uint128_t word_t;
+//typedef hls::stream<word_t> message_stream_t;
+//typedef hls::stream<apenet_header_t> header_stream_t;
+//typedef short channel_id_t;
+//typedef short task_id_t;
 
 
 namespace ape{
@@ -32,12 +32,12 @@ void reader(
 		//header_stream_t fifo_hdr_out[NCHAN],
 		message_stream_t fifo_data_out[NCHAN])
 {
-	//while (true) {
+	while (true) {
 		apenet_header_t hdr = fifo_hdr_in.read();
 
 		unsigned input_channel = hdr.s.proc_id;
 		unsigned size = hdr.s.packet_size;
-		
+	
 		word_t tmp_header = apenet_2_word(hdr);
 		/*tmp_header(127,123)=hdr.s.virt_chan;
 		tmp_header(122,107)=hdr.s.proc_id;
@@ -55,11 +55,15 @@ void reader(
 */
 		fifo_data_out[input_channel].write(tmp_header);
 
-		for (unsigned i = 0; i < size/sizeof(uint128_t); ++i) {
+		unsigned nwords = (size & (sizeof(word_t)-1)) ? (size/sizeof(word_t)+1) : size/sizeof(word_t);
+
+		for (unsigned i = 0; i < nwords; ++i) {
+			#pragma HLS PIPELINE II=1
 			#pragma HLS LOOP_TRIPCOUNT min=1 max=256
 			//#pragma HLS UNROLL
-			auto tmp = fifo_data_in.read();
-			fifo_data_out[input_channel].write(tmp);
+			//auto tmp = fifo_data_in.read();
+			//fifo_data_out[input_channel].write(tmp);
+			fifo_data_out[input_channel].write(fifo_data_in.read());
 		}
 
 		apenet_header_t ftr = fifo_hdr_in.read();
@@ -79,15 +83,15 @@ void reader(
 		tmp_footer(7,0)=ftr.s.edac;*/
 		
 		fifo_data_out[input_channel].write(tmp_footer); //footer
-	//}
+	}
 }
 
 template <typename T>
 void writer(T &fifo_in, T &fifo_out) {
-	//while (true) {
+	while (true) {
 		auto tmp = fifo_in.read();
 		fifo_out.write(tmp);
-	//}
+	}
 }
 
 template <unsigned NCHAN, unsigned HD_DEPTH, unsigned DT_DEPTH>
@@ -98,15 +102,16 @@ void dispatcher_template(
 {
 #pragma HLS INLINE
 
-	//message_stream_t dt_stream[NCHAN];
-	//#pragma HLS STREAM variable=dt_stream depth=DT_DEPTH
+	message_stream_t dt_stream[NCHAN];
+	#pragma HLS STREAM variable=dt_stream depth=DT_DEPTH
 
-	reader<NCHAN>(fifo_hdr_in, fifo_data_in, fifo_data_out);
-	/*for (unsigned i=0; i<NCHAN; i++) {
-	#pragma HLS PIPELINE style = flp	
+	reader<NCHAN>(fifo_hdr_in, fifo_data_in, dt_stream);
+	for (unsigned i=0; i<NCHAN; i++) {
+	#pragma HLS UNROLL
+	//#pragma HLS PIPELINE style = flp	
 		//if(dt_stream[i].empty()) continue;
 		writer<message_stream_t>(dt_stream[i], fifo_data_out[i]);
-	}*/
+	}
 }
 
 }

@@ -7,21 +7,21 @@ import os
 import shutil
 
 
-def generate_linker_common(filename="vpp_linker.cfg", name='', replica=''):
+def generate_linker_common(freq0, freq1, filename="vpp_linker.cfg", name='', replica=''):
     if name!='':
         name = 'nk='+name+':'
     if replica=='1':
         replica = ''
 
     out_str='''
-kernel_frequency=0:200|1:200
+kernel_frequency=0:@FREQ0@|1:@FREQ1@
 
 [advanced]
 misc=solution_name=link_project
 
 [connectivity]
 @NAME@REPLICA
-'''.replace('@NAME',name).replace('@REPLICA',replica)
+'''.replace('@NAME',name).replace('@REPLICA',replica).replace('@FREQ0@',str(freq0)).replace('@FREQ1@',str(freq1))
 
     with open(filename,"w") as f:
         f.write(out_str)
@@ -56,16 +56,17 @@ def stream_connect(source, dest, channel='', kchannel='', switch_port=''):
 
 
 
-def generate_kernel_cfg(name, dest_dir="hw_hls/autogen"):
+def generate_kernel_cfg(name, freq_hz, dest_dir="hw_hls/autogen"):
+    freq_mhz = freq_hz * 1000000
     out_str = '''
 kernel=@NAME@
 
 [hls]
-clock=200000000:@NAME@
+clock=@FREQ_MHZ@:@NAME@
 
 [advanced]
 misc=solution_name=@NAME@
-'''.replace('@NAME@', name)
+'''.replace('@NAME@', name).replace('@FREQ_MHZ@',str(freq_mhz))
 
     with open(f'{dest_dir}/{name}/{name}.cfg',"w") as f:
         f.write(out_str)
@@ -79,13 +80,13 @@ void @NAME@(header_stream_t &fifo_hdr_in,message_stream_t &fifo_data_in/*,header
 #pragma HLS INTERFACE ap_ctrl_none port=return
 //#pragma HLS INTERFACE axis port=fifo_hdr_out
 #pragma HLS INTERFACE axis port=fifo_data_out
-//#pragma HLS DATAFLOW
+#pragma HLS DATAFLOW
     ape::dispatcher_template<N_OUTPUT_CHANNEL, 128, (512+1024)>(fifo_hdr_in, fifo_data_in, /*fifo_hdr_out,*/ fifo_data_out);
 }
 '''.replace('@NCHAN@', str(nchan)).replace('@NAME@', 'dispatcher_'+str(nport))
 
     os.makedirs(f'{dest_dir}/{name}', exist_ok=True)
-    generate_kernel_cfg(name, dest_dir)
+    generate_kernel_cfg(name, clk_freq_domain0, dest_dir)
     with open(f'{dest_dir}/{name}/{name}.cpp',"w") as f:
         f.write(out_str)
 
@@ -105,7 +106,7 @@ void @NAME@(unsigned nevents /*header_stream_t fifo_hdr_in[N_INPUT_CHANNEL]*/,me
 
     os.makedirs(f'{dest_dir}/{name}', exist_ok=True)
 
-    generate_kernel_cfg(name, dest_dir)
+    generate_kernel_cfg(name, clk_freq_domain0, dest_dir)
     with open(f'{dest_dir}/{name}/{name}.cpp',"w") as f:
         f.write(out_str)
 
@@ -152,6 +153,17 @@ with open(config_file) as file:
     params = yaml.safe_load(file)
     kernels = params['kernels']
     config = params['config']
+
+
+clk_freq_domain0 = 100
+clk_freq_domain1 = 100
+
+if "freq0" in config:
+    clk_freq_domain0 = config['freq0'] 
+
+if "freq1" in config:
+    clk_freq_domain1 = config['freq1'] 
+
 
 if args.list_autogen:
         one=0
@@ -200,7 +212,7 @@ for i in range(0,len(string_list)-1):
     if(i < len(string_list)-2):
         name+='_'
 
-generate_linker_common("vpp_linker.cfg", name, str(num_replica))
+generate_linker_common(clk_freq_domain0, clk_freq_domain1, "vpp_linker.cfg", name, str(num_replica))
 
 in_channels = [0,0,0,0]
 out_channels = [0,0,0,0]

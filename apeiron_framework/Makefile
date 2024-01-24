@@ -5,7 +5,7 @@ TARGET ?= hw
 #TARGET ?= hw_emu
 AUTOGEN_YAML ?= config.yaml
 
-TARGET_APP ?= CNN_apeiron_preprocessing_node
+TARGET_APP ?= image_processing
 
 LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS += -std=c++1y -I$(XILINX_XRT)/include -Wall

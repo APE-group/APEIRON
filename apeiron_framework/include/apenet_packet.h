@@ -7,7 +7,8 @@
 extern "C" {
 
 typedef union {
-	struct __attribute__((packed)) {
+	struct __attribute__((packed)) {	
+
 		unsigned long virt_chan      :  5;
 		unsigned long proc_id        : 16;
 		unsigned long dest_x         :  6;
@@ -21,6 +22,7 @@ typedef union {
 		unsigned long dest_addr      : 48;
 		unsigned long num_of_hops    : 10;
 		unsigned long edac           :  8;
+
 	} s;
 	uint32_t l[4];
 	uint64_t u[2];
