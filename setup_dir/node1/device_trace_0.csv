@@ -1,0 +1,91 @@
+HEADER
+VTF File Version,1.1
+VTF File Type,1
+PID,22737
+Generated on,2024-03-06 10:47:56
+Resolution,ms
+Min Resolution,ns
+Trace Version,1.1
+TraceID,22738
+XRT  Version,2.15.225
+Tool Version,2023.1
+Platform,xilinx_u280_gen3x16_xdma_base_1
+Target,System Run
+
+STRUCTURE
+Group_Start,xilinx_u280_gen3x16_xdma_base_1
+Group_Start,test.xclbin
+Group_Start,Compute Unit top_nnet_1 - No Trace,Activity in accelerator top_nnet:top_nnet_1
+Group_End,top_nnet_1
+Group_Start,Compute Unit top_nnet_2 - No Trace,Activity in accelerator top_nnet:top_nnet_2
+Group_End,top_nnet_2
+Group_Start,Compute Unit top_nnet_3 - No Trace,Activity in accelerator top_nnet:top_nnet_3
+Group_End,top_nnet_3
+Group_Start,Compute Unit top_nnet_4 - No Trace,Activity in accelerator top_nnet:top_nnet_4
+Group_End,top_nnet_4
+Group_Start,Compute Unit top_nnet_5 - No Trace,Activity in accelerator top_nnet:top_nnet_5
+Group_End,top_nnet_5
+Group_Start,Compute Unit top_nnet_6 - No Trace,Activity in accelerator top_nnet:top_nnet_6
+Group_End,top_nnet_6
+Group_Start,Compute Unit top_nnet_7 - No Trace,Activity in accelerator top_nnet:top_nnet_7
+Group_End,top_nnet_7
+Group_Start,Compute Unit top_nnet_8 - No Trace,Activity in accelerator top_nnet:top_nnet_8
+Group_End,top_nnet_8
+Group_Start,Compute Unit TextaRossa_switch_1 - No Trace,Activity in accelerator TextaRossa_switch:TextaRossa_switch_1
+Group_End,TextaRossa_switch_1
+Group_Start,Compute Unit aggregator_0_1 - No Trace,Activity in accelerator aggregator_0:aggregator_0_1
+Group_End,aggregator_0_1
+Group_Start,Compute Unit aggregator_1_1 - No Trace,Activity in accelerator aggregator_1:aggregator_1_1
+Group_End,aggregator_1_1
+Group_Start,Compute Unit aggregator_2_1 - No Trace,Activity in accelerator aggregator_2:aggregator_2_1
+Group_End,aggregator_2_1
+Group_Start,Compute Unit aggregator_3_1 - No Trace,Activity in accelerator aggregator_3:aggregator_3_1
+Group_End,aggregator_3_1
+Group_Start,Compute Unit dispatcher_0_1 - No Trace,Activity in accelerator dispatcher_0:dispatcher_0_1
+Group_End,dispatcher_0_1
+Group_Start,Compute Unit dispatcher_1_1 - No Trace,Activity in accelerator dispatcher_1:dispatcher_1_1
+Group_End,dispatcher_1_1
+Group_Start,Compute Unit dispatcher_2_1 - No Trace,Activity in accelerator dispatcher_2:dispatcher_2_1
+Group_End,dispatcher_2_1
+Group_Start,Compute Unit dispatcher_3_1 - No Trace,Activity in accelerator dispatcher_3:dispatcher_3_1
+Group_End,dispatcher_3_1
+Group_End,test.xclbin
+Group_End,xilinx_u280_gen3x16_xdma_base_1
+
+MAPPING
+14,TextaRossa_switch
+15,TextaRossa_switch_1
+16,aggregator_0
+17,aggregator_0_1
+18,aggregator_1
+19,aggregator_1_1
+20,aggregator_2
+21,aggregator_2_1
+22,aggregator_3
+23,aggregator_3_1
+24,dispatcher_0
+25,dispatcher_0_1
+26,dispatcher_1
+27,dispatcher_1_1
+28,dispatcher_2
+29,dispatcher_2_1
+30,dispatcher_3
+31,dispatcher_3_1
+5,top_nnet
+6,top_nnet_1
+7,top_nnet_2
+8,top_nnet_3
+9,top_nnet_4
+10,top_nnet_5
+11,top_nnet_6
+12,top_nnet_7
+13,top_nnet_8
+1,xrt::device::device
+2,xrt::device::load_xclbin
+4,xrt::ip::read_register
+3,xrt::ip::write_register
+
+EVENTS
+
+DEPENDENCIES
+

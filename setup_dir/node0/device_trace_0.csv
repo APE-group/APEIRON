@@ -1,0 +1,96 @@
+HEADER
+VTF File Version,1.1
+VTF File Type,1
+PID,29264
+Generated on,2024-03-06 10:48:05
+Resolution,ms
+Min Resolution,ns
+Trace Version,1.1
+TraceID,29265
+XRT  Version,2.15.225
+Tool Version,2023.1
+Platform,xilinx_u280_gen3x16_xdma_base_1
+Target,System Run
+
+STRUCTURE
+Group_Start,xilinx_u280_gen3x16_xdma_base_1
+Group_Start,test.xclbin
+Group_Start,Compute Unit image_sender_1 - No Trace,Activity in accelerator image_sender:image_sender_1
+Group_End,image_sender_1
+Group_Start,Compute Unit image_sender_2 - No Trace,Activity in accelerator image_sender:image_sender_2
+Group_End,image_sender_2
+Group_Start,Compute Unit image_sender_3 - No Trace,Activity in accelerator image_sender:image_sender_3
+Group_End,image_sender_3
+Group_Start,Compute Unit TextaRossa_switch_1 - No Trace,Activity in accelerator TextaRossa_switch:TextaRossa_switch_1
+Group_End,TextaRossa_switch_1
+Group_Start,Compute Unit aggregator_0_1 - No Trace,Activity in accelerator aggregator_0:aggregator_0_1
+Group_End,aggregator_0_1
+Group_Start,Compute Unit aggregator_1_1 - No Trace,Activity in accelerator aggregator_1:aggregator_1_1
+Group_End,aggregator_1_1
+Group_Start,Compute Unit aggregator_2_1 - No Trace,Activity in accelerator aggregator_2:aggregator_2_1
+Group_End,aggregator_2_1
+Group_Start,Compute Unit aggregator_3_1 - No Trace,Activity in accelerator aggregator_3:aggregator_3_1
+Group_End,aggregator_3_1
+Group_Start,Compute Unit dispatcher_0_1 - No Trace,Activity in accelerator dispatcher_0:dispatcher_0_1
+Group_End,dispatcher_0_1
+Group_Start,Compute Unit dispatcher_1_1 - No Trace,Activity in accelerator dispatcher_1:dispatcher_1_1
+Group_End,dispatcher_1_1
+Group_Start,Compute Unit dispatcher_2_1 - No Trace,Activity in accelerator dispatcher_2:dispatcher_2_1
+Group_End,dispatcher_2_1
+Group_Start,Compute Unit dispatcher_3_1 - No Trace,Activity in accelerator dispatcher_3:dispatcher_3_1
+Group_End,dispatcher_3_1
+Group_Start,Compute Unit krnl_receiver_1 - No Trace,Activity in accelerator krnl_receiver:krnl_receiver_1
+Group_End,krnl_receiver_1
+Group_Start,Compute Unit krnl_sender_1 - No Trace,Activity in accelerator krnl_sender:krnl_sender_1
+Group_End,krnl_sender_1
+Group_End,test.xclbin
+Group_End,xilinx_u280_gen3x16_xdma_base_1
+
+MAPPING
+16,READ
+21,TextaRossa_switch
+22,TextaRossa_switch_1
+9,WRITE
+23,aggregator_0
+24,aggregator_0_1
+25,aggregator_1
+26,aggregator_1_1
+27,aggregator_2
+28,aggregator_2_1
+29,aggregator_3
+30,aggregator_3_1
+31,dispatcher_0
+32,dispatcher_0_1
+33,dispatcher_1
+34,dispatcher_1_1
+35,dispatcher_2
+36,dispatcher_2_1
+37,dispatcher_3
+38,dispatcher_3_1
+17,image_sender
+18,image_sender_1
+19,image_sender_2
+20,image_sender_3
+39,krnl_receiver
+40,krnl_receiver_1
+41,krnl_sender
+42,krnl_sender_1
+13,xrt::bo::address
+5,xrt::bo::bo
+6,xrt::bo::map
+7,xrt::bo::size
+8,xrt::bo::sync
+1,xrt::device::device
+2,xrt::device::load_xclbin
+11,xrt::ip::read_register
+10,xrt::ip::write_register
+4,xrt::kernel::group_id
+3,xrt::kernel::kernel
+12,xrt::run::run
+14,xrt::run::start
+15,xrt::run::wait
+
+EVENTS
+
+DEPENDENCIES
+

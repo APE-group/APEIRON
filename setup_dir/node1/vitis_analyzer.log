@@ -1,0 +1,16 @@
+#-----------------------------------------------------------
+# Vitis Analyzer v2022.1.2 (64-bit)
+# SW Build 3605665 on Fri Aug  5 22:52:02 MDT 2022
+# 
+# Start of session at: Wed Mar  6 10:48:40 2024
+# Process ID: 22864
+# Current directory: /apotto/home1/aliens/rossi/APEIRON/setup_dir/node1
+# Command line: vitis_analyzer xrt.run_summary
+# Log file: /apotto/home1/aliens/rossi/APEIRON/setup_dir/node1/vitis_analyzer.log
+# Journal file: /apotto/home1/aliens/rossi/APEIRON/setup_dir/node1/vitis_analyzer.jou
+# Running On: apequad01, OS: Linux, CPU Frequency: 4000.000 MHz, CPU Physical cores: 10, Host memory: 134862 MB
+#-----------------------------------------------------------
+start_gui
+create_project dummy
+exit
+INFO: [Common 17-206] Exiting vitis_analyzer at Wed Mar  6 11:08:06 2024...
