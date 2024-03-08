@@ -1,16 +1,17 @@
-PLATFORM ?= xilinx_u200_gen3x16_xdma_2_202110_1
-#PLATFORM ?= xilinx_u280_xdma_201920_3
+#PLATFORM ?= xilinx_u200_gen3x16_xdma_2_202110_1
+PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
 XCLBIN_NAME ?= test.xclbin
 TARGET ?= hw
 #TARGET ?= hw_emu
 AUTOGEN_YAML ?= config.yaml
 
-TARGET_APP ?= image_processing
-
+#TARGET_APP ?= CNN_apeiron_computing_node
+TARGET_APP ?= CNN_apeiron_preprocessing_node
+#TARGET_APP ?= lat_bw
 LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS += -std=c++1y -I$(XILINX_XRT)/include -Wall
 
-PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test host_test emconfig.json 
+PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test host_test host_computing_node emconfig.json 
 
 VPP ?= v++
 VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM)
