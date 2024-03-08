@@ -156,9 +156,9 @@ int main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
-	xrt::device device;
+	xrt::device device(0);
 	bool device_found = false;
-	for (unsigned d=0; d<ndevices; ++d) {
+/*	for (unsigned d=0; d<ndevices; ++d) {
 		device = xrt::device(d);
 		if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_2_202110_1") { // TODO: board name as command line argument
 			device_found = true;
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
 	if (!device_found) {
 		std::cerr << "Device xilinx_u200_gen3x16_xdma_base_2 not found\n";
 		exit(EXIT_FAILURE);
-	}
+	}*/
 	std::cout << "Device name: " << device.get_info<xrt::info::device::name>() << std::endl;
 	std::cout << "Device bdf: " << device.get_info<xrt::info::device::bdf>() << std::endl;
 	std::cout << "Device max freq: " << device.get_info<xrt::info::device::max_clock_frequency_mhz>() << std::endl;
@@ -182,10 +182,16 @@ int main(int argc, char** argv)
 	
 	kswitch_thread = kswitch; //ip handle for parallel thread 
 	
-	if(local_coord == 0){
 		xrt::kernel kreceiver(device, uuid, "krnl_receiver:{krnl_receiver_1}");
 		xrt::kernel ksender(device, uuid, "krnl_sender:{krnl_sender_1}");
 		xrt::kernel image_sender(device, uuid, "image_sender:{image_sender_1}");
+		
+		xrt::kernel image_sender1(device, uuid, "image_sender:{image_sender_2}");
+		xrt::kernel image_sender2(device, uuid, "image_sender:{image_sender_3}");
+
+	//	xrt::ip ktopnnet1(device, uuid, "top_nnet:{top_nnet_1}");
+		
+		
 		std::ofstream outfile("data.dat");
 	
 		std::vector<stream_data_t> m2egp;
@@ -237,22 +243,33 @@ int main(int argc, char** argv)
 			return EXIT_FAILURE;
 		}
 		
+		xrt::run kreceiver_run = kreceiver(recv_buffer, m2egp_count, 1,false);
 
-		xrt::run image_sender_run = image_sender(2,4);
 
+		
+		
+		xrt::run image_sender_run = image_sender(1,2,0,false);
+		xrt::run image_sender_run1 = image_sender1(1,2,1,false);
+		xrt::run image_sender_run2 = image_sender2(1,2,2,false);
+		//ktopnnet1.write_register(0x10,0);
+		/*xrt::run image_sender_run1 = image_sender1(1,1,1,
+		false);
+		xrt::run image_sender_run2 = image_sender2(1,1,2,false);
+*/
 		std::chrono::duration<double, std::nano> deltat;
 	
 		std::printf("Running receiver kernel ...\n");
-		xrt::run kreceiver_run = kreceiver(recv_buffer, m2egp_count);
+//		xrt::run kreceiver_run = kreceiver(recv_buffer, m2egp_count);
 
 		std::printf("Starting sender kernel ... \n");
 	
 	
 		auto tstart = std::chrono::high_resolution_clock::now();
-		xrt::run ksender_run = ksender(ndevices, npackets, send_buffer);
+		xrt::run ksender_run = ksender(ndevices, npackets, send_buffer,true);
 		//std::printf("Waiting for sender kernel to complete ...\n");
-	//	ksender_run.wait();
+		//ksender_run.wait();
 	//std::printf("Waiting for receiver kernel to complete ...\n");
+	
 		kreceiver_run.wait();
 
 		auto tend = std::chrono::high_resolution_clock::now();
@@ -304,30 +321,6 @@ int main(int argc, char** argv)
 	 	kill = true;
    	pthread_join(thread_registers, NULL);
 	//free(rings);
-	}
-	else{
-		std::printf("Resetting switch\n");
-		kswitch.write_register(4*4, 0x1); // auto-toggle reset
-		sleep(1);
-		kswitch.write_register(6*4, local_coord); // X coordinate
-//		kswitch.write_register(68*4, 0x00030000); // overwrite destination
-		kswitch.write_register(69*4, 0x01800060); // threshold
-		kswitch.write_register(70*4, 0x0000ff40); // new credit cycle
-		std::printf("CHANNEL_UP: %x\n", kswitch.read_register(67*4));
-
-		int s = pthread_create(&thread_registers, NULL, thr_func, NULL);
-			if(s){
-				std::cout<<"Error in thread creation"<<std::endl;
-			return EXIT_FAILURE;
-		}
-		
-		while(!kill){
-			if(nreg >= 10) kill = true;
-		}
-   	pthread_join(thread_registers, NULL);
-	}
-	
-	
 
 
 	return 0;
