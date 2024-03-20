@@ -17,7 +17,7 @@
 #include "read_registers.hpp"
 
 #include <pthread.h>
-#define INTERNAL_GENERATOR 0
+#define INTERNAL_GENERATOR 1
 #define CABLE_LOOPBACK 0
 #define CONSUMER 0
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 	//Flags getting values
 	while (1) {
 		int option_index;
-		int c = getopt_long(argc, argv, "b:l:n:s:qh:mx:i:c", test_options, &option_index);
+		int c = getopt_long(argc, argv, "b:l:n:s:qh:mx:i:c:", test_options, &option_index);
 
 		if (c == -1) break;
 
@@ -113,15 +113,15 @@ int main(int argc, char** argv)
 			case 'x':
 				xdest =  atoi(optarg);
 				break;
-			case 'i':
-				dest_task_id = atoi(optarg);
+			case 'c':
+				local_coord = atoi(optarg);
 				break;
 			case 's':
 				start_port = atoi(optarg);
 				break;
-			case 'c':
-            local_coord = 1;
-            break;
+			case 'i':
+            			dest_task_id = atoi(optarg);
+            			break;
 			case 'h':
 				print_usage(argv[0]);
 				exit(EXIT_SUCCESS);
@@ -153,7 +153,8 @@ int main(int argc, char** argv)
 	
 	xrt::profile::user_event events;
 
-
+	std::cout<<"XDEST = "<<xdest<<std::endl;
+	std::cout<<"COORD = "<<local_coord<<std::endl;
 	unsigned ndevices = xrt::system::enumerate_devices();
 	if (ndevices == 0) {
 		std::cerr << "no device found\n";
@@ -165,6 +166,8 @@ int main(int argc, char** argv)
 	for (unsigned d=0; d<ndevices; ++d) {
 		device = xrt::device(d);
 		if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_base_2") { // TODO: board name as command line argument
+	
+		//if (device.get_info<xrt::info::device::name>() == "xilinx_u280_gen3x16_xdma_base_1") { // TODO: board name as command line argument
 			device_found = true;
 			break;
 		}
@@ -197,7 +200,7 @@ int main(int argc, char** argv)
 	else if(start_port==2) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_3}");
 	else if(start_port==3) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_4}");
 
-  if(local_coord==1 || (xdest==0 && start_port!=dest_task_id)){
+  if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) ){
   		if(dest_task_id==0) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_1}");
   		else if(dest_task_id==1) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_2}");
   		else if(dest_task_id==2) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_3}");
@@ -226,7 +229,7 @@ int main(int argc, char** argv)
   	}
  	
 	if(!quiet){
-		for (int i=26;i<36;i++){
+		for (int i=0;i<200;i++){
 			std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
 		}
 		std::printf("Press a key to continue\n");
@@ -234,8 +237,10 @@ int main(int argc, char** argv)
 	}
 
 	if(!quiet) std::printf("Resetting switch\n");
+	
 	kswitch.write_register(4*4, 0x1); // auto-toggle reset
 	sleep(1);
+	kswitch.write_register(4*4, 0x0);
 	if(!quiet){
 		for (int i=26;i<36;i++){
         	std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
@@ -251,11 +256,13 @@ int main(int argc, char** argv)
 	kswitch.write_register(6*4, local_coord); //3D coordinate
 	
 
-//	kswitch.write_register(68*4, 0x00030000); // overwrite destination (needed for cable loopback)
+	if(CABLE_LOOPBACK) kswitch.write_register(68*4, 0x00030000); // overwrite destination (needed for cable loopback)
 	kswitch.write_register(69*4, 0x01800060); // threshold
 	kswitch.write_register(70*4, 0x0000ff40); // new credit cycle
-	if(!quiet) std::printf("CHANNEL_UP: %x\n", kswitch.read_register(67*4));
-
+	if(!quiet) std::printf("CHANNEL_UP: internode 0 = %x \t internode 1 = %x\n", kswitch.read_register(152*4) & 0b01, (kswitch.read_register(152*4) & 0b10)/2); //channels alligned
+	
+	kswitch.write_register(200*4, 0xfafbfcfd); //eth
+	
 	//Register Thread start
 	if(!quiet){
 	       	int s = pthread_create(&thread_registers, NULL, thr_func, NULL);
@@ -269,12 +276,15 @@ int main(int argc, char** argv)
                unsigned tmp = npackets + (packet_size << 16);
                kswitch.write_register(14*4, tmp);
 
-               //if(cable_loopback) kswitch.write_register(16*4, 0x00000001);
+               kswitch.write_register(16*4, 0x00000001);
                std::printf("Starting packet generator ...\n");
 
-               kswitch.write_register(12*4, 0x00000101);
+	       if(local_coord>0) kswitch.write_register(12*4, 0x00000100);
+               else kswitch.write_register(12*4, 0x00000101);
 
-               sleep(1);
+               //kswitch.write_register(12*4, 0x00000101);
+
+               sleep(5);
                std::printf("Test ok: %x\n",kswitch.read_register(20*4)); // Tet_ok bi
                std::printf("Clock cycle: %u\n", kswitch.read_register(22*4));
                exit(0);
@@ -287,13 +297,13 @@ int main(int argc, char** argv)
 	
 	xrt::run krnl_sender_receiver_run;
 	xrt::run krnl_sender_receiver_run2;
-	if(local_coord==1 || (xdest==0 && start_port!=dest_task_id))	krnl_sender_receiver_run2 = krnl_sender_receiver2(xdest, start_port, npackets, npackets, packet_size, NULL, NULL, 1, 1);
+	if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) )	krnl_sender_receiver_run2 = krnl_sender_receiver2(xdest, start_port, npackets, npackets, packet_size, NULL, NULL, 1, 1);
 	
 	if(local_coord==0 || xdest==1) krnl_sender_receiver_run = krnl_sender_receiver(xdest, dest_task_id, npackets, npackets, packet_size, send_buffer, recv_buffer, bram, status);
 
 	if(!quiet) std::printf("Waiting for receiver kernel to complete ...\n");
 	
-	if(local_coord==1 || (xdest==0 && start_port!=dest_task_id)) krnl_sender_receiver_run2.wait();
+	if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) ) krnl_sender_receiver_run2.wait();
 	if(local_coord==0 || xdest==1) krnl_sender_receiver_run.wait();
 	if(bram==0 && status!=2) recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 	gettimeofday(&endTime,NULL);
