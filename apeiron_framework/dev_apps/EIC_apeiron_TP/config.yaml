@@ -1,0 +1,58 @@
+kernels:
+
+  - name: krnl_sr_1
+    input_channels: 6
+    output_channels: 6
+    switch_port: 0
+
+  - name: krnl_dummy_1
+    input_channels: 1
+    output_channels: 0
+    switch_port: 1
+
+  - name: krnl_dummy_2
+    input_channels: 1
+    output_channels: 0
+    switch_port: 2
+
+  - name: krnl_dummy_3
+    input_channels: 1
+    output_channels: 0
+    switch_port: 3
+
+  - name: top_TP_block_1
+    input_channels: 0
+    output_channels: 1
+    switch_port: 1
+
+  - name: top_TP_block_2
+    input_channels: 0
+    output_channels: 1
+    switch_port: 1
+
+  - name: top_TP_block_3
+    input_channels: 0
+    output_channels: 1
+    switch_port: 2
+
+  - name: top_TP_block_4
+    input_channels: 0
+    output_channels: 1
+    switch_port: 2
+
+  - name: top_TP_block_5
+    input_channels: 0
+    output_channels: 1
+    switch_port: 3
+
+  - name: top_TP_block_6
+    input_channels: 0
+    output_channels: 1
+    switch_port: 3
+
+
+config:
+  freq0: 200
+  freq1: 200
+  links: 2
+
