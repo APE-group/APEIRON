@@ -1,17 +1,21 @@
 #PLATFORM ?= xilinx_u200_gen3x16_xdma_2_202110_1
 PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
-XCLBIN_NAME ?= test.xclbin
-TARGET ?= hw
-#TARGET ?= hw_emu
+XCLBIN_NAME ?= test_hw_TP_bram.xclbin
+#TARGET ?= hw
+TARGET ?= hw_emu
 AUTOGEN_YAML ?= config.yaml
 
 #TARGET_APP ?= CNN_apeiron_computing_node
-TARGET_APP ?= CNN_apeiron_preprocessing_node
+#TARGET_APP ?= CNN_apeiron_preprocessing_node
+#TARGET_APP ?= image_processing
 #TARGET_APP ?= lat_bw
-LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
-CXXFLAGS += -std=c++1y -I$(XILINX_XRT)/include -Wall
+TARGET_APP ?= EIC_apeiron_TP
+#TARGET_APP ?= EIC_apeiron_DAMI
 
-PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test host_test host_computing_node emconfig.json 
+LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
+CXXFLAGS += -g -std=c++1y -I$(XILINX_XRT)/include -Wall
+
+PRODUCTS := $(XCLBIN_NAME) bandwidth_test latency_test host_test host_computing_node host host_switch host_noswitch host_noswitch_bramload emconfig.json 
 
 VPP ?= v++
 VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM)
