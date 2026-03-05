@@ -1,0 +1,25 @@
+kernels:
+
+  - name: net_krnl_1
+    input_channels: 1
+    output_channels: 1
+    switch_port: 0
+
+  - name: acc_krnl_1
+    input_channels: 1
+    output_channels: 1
+    switch_port: 1
+    
+  - name: acc_krnl_2
+    input_channels: 1
+    output_channels: 1
+    switch_port: 2
+
+  - name: acc_krnl_3
+    input_channels: 1
+    output_channels: 1
+    switch_port: 3
+
+config:
+  freq: 200
+  links: 2

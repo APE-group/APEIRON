@@ -1,0 +1,46 @@
+kernels:
+
+  - name: krnl_load_1
+    input_channels: 5
+    output_channels: 0
+    switch_port: 0
+
+
+  - name: sector_histogram_1
+    input_channels: 0
+    output_channels: 1
+    switch_port: 0
+  
+  - name: krnl_load_2
+    input_channels: 5
+    output_channels: 0
+    switch_port: 1
+
+
+  - name: sector_histogram_2
+    input_channels: 0
+    output_channels: 1
+    switch_port: 1
+  
+  - name: krnl_load_3
+    input_channels: 5
+    output_channels: 0
+    switch_port: 2
+
+
+  - name: sector_histogram_3
+    input_channels: 0
+    output_channels: 1
+    switch_port: 2
+  
+
+  - name: result_recv_GTU_send_1
+    input_channels: 1
+    output_channels: 5
+    switch_port: 3
+  
+
+config:
+  freq0: 200
+  freq1: 200
+  links: 2

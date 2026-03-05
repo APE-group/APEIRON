@@ -1,0 +1,240 @@
+Bit 0: write ‘1’ to reset;  
+Self-clear (‘0’ after 200 clock’s cycle) 
+######
+Bit 15 downto 0:  Revision ID 
+Bit 31 downto 16: Version ID 
+######
+3D node’s coordinates  
+Bit 5 downto 0: X coordinate 
+######
+Lattice size 
+Bit 5 downto 0: X direction
+######
+Perf_Block configuration register:
+Bit 7 downto 0: IntraNode Packet_Generator enable 
+Bit 15 downto 8: IntraNode Consumer enable 
+######
+Perf_Block configuration register: 
+Bit 7 downto 0: InterNode Packet_Generator enable 
+Bit 15 downto 8: InterNode Consumer enable 
+######
+Packet_generator configuration register: 
+Bit 15 downto 0: number of packets generated 
+Bit 29 downto 16: packet length (in byte) 
+Bit 31: header only packet generated 
+######
+Destination of packet 
+Bit 5 downto 0: X direction
+######
+Bit 3  downto 0: packet_generator status (intraNode 0) 
+Bit 7  downto 4: packet_checker status   (intraNode 0) 
+Bit 11 downto 8: packet_generator status (intraNode 1) 
+Bit 15 downto 12: packet_checker status   (intraNode 1) 
+Bit 19 downto 16: packet_generator status (intraNode 2) 
+Bit 23 downto 20: packet_checker status   (intraNode 2) 
+Bit 27 downto 24: packet_generator status (intraNode 3) 
+Bit 31 downto 28: packet_checker status   (intraNode 3) 
+
+*Packet_generator status: 
+"0000" SM_STATE = OFF 
+"0001" SM_STATE = IDLE 
+"0010" SM_STATE = TX_HEADER "0011" SM_STATE = TX_PAYLOAD 
+"0100" SM_STATE = TX_FOOTER 
+
+**Packet_checker status 
+
+Bit 0 = Test ok! (All packets received with correct payload) 
+Bit 3 downto 1: SM STATE  
+   "000" SM_STATE = OFF 
+   "001" SM_STATE = IDLE 
+   "010" SM_STATE = COUNT 
+######
+Bit 3  downto 0: packet_generator status (see register PERF_INTRANODE_STS) 
+Link 0 
+Bit 7  downto 4: packet_checker status Link 0 
+Bit 11 downto 8: packet_generator status Link 1 
+Bit 15 downto 12: packet_checker status Link 1 
+######
+TxRx clock counter (first packet   written, last packet read) IntraNode 0 
+######
+TxRx clock counter (first packet   written, last packet read) IntraNode 1 
+######
+TxRx clock counter (first packet   written, last packet read) IntraNode 2 
+######
+TxRx clock counter (first packet   written, last packet read) IntraNode 3 
+######
+TxRx clock counter (first packet   written, last packet read) InterNode 0 
+######
+TxRx clock counter (first packet   written, last packet read) InterNode 1 
+######
+Bit 31 downto 16: Fifo IntraNode 0 Data Rx UsedWord
+Bit 15 downto 0: Fifo IntraNode 0 Header Rx UsedWord 
+######
+Bit 31 downto 16: Fifo IntraNode 0 Data Tx UsedWord 
+Bit 15 downto 0: Fifo IntraNode 0 Header Tx UsedWord 
+######
+Fifo IntraNode 0 Header Tx read counter 
+######
+Fifo IntraNode 0 Header Tx write counter 
+######
+Fifo IntraNode 0 Header Rx read counter 
+######
+Fifo IntraNode 0 Header Rx write counter 
+######
+IntraNode 0 Data Tx read counter 
+######
+IntraNode 0 Data Tx write counter 
+######
+IntraNode 0 Data Rx read counter 
+######
+IntraNode 0 Data Rx write counter
+######
+Bit 31 downto 16: Fifo IntraNode 1 Data Rx UsedWord
+Bit 15 downto 0: Fifo IntraNode 1 Header Rx UsedWord 
+######
+Bit 31 downto 16: Fifo IntraNode 1 Data Tx UsedWord 
+Bit 15 downto 0: Fifo IntraNode 1 Header Tx UsedWord 
+######
+Fifo IntraNode 1 Header Tx read counter 
+######
+Fifo IntraNode 1 Header Tx write counter 
+######
+Fifo IntraNode 1 Header Rx read counter 
+######
+Fifo IntraNode 1 Header Rx write counter 
+######
+IntraNode 1 Data Tx read counter 
+######
+IntraNode 1 Data Tx write counter 
+######
+IntraNode 1 Data Rx read counter 
+######
+IntraNode 1 Data Rx write counter 
+######
+Bit 7  downto 0   = IntraNode TX HD write exception  
+Bit 15 downto 8   = IntraNode TX DT write exception 
+Bit 23 downto 16 = IntraNode RX HD write exception 
+Bit 31 downto 24 = IntraNode RX DT write exception  
+######
+Bit 31 downto 24: Fifo Header Rx exp width 
+Bit 23 downto 16: Fifo Data Rx exp width    
+Bit 15 downto 8: Fifo Header Tx exp width 
+Bit 7 downto 0: Fifo Data Tx exp width 
+######
+Bit 0: InterNode 0 channel up 
+Bit 1: InterNode 1 channel up 
+Bit 16: InterNode 0 transceiver’s error 
+Bit 17: InterNode 1 transceiver’s error   
+######
+Bit 31 downto 28: Edac enable InterNode 1 
+     "0000" NO EDAC 
+     "1111" EDAC 
+Bit 27 downto 24 = Edac enable InterNode 0 
+Bit 17 = Use new destination in InterNode 1 
+Bit 16 = Use new destination in InterNode 0 
+Bit 15 downto 0: New destination (15–11: Z; 10–6: Y; 5–0:X). 
+######
+LINK_0_CONFIG_1
+######
+Bit 15 downto 8: Tx new credit cycle 
+Bit 7 downto 0: Tx waiting cycle 
+######
+Header error gen 
+######
+Bit 15 downto 12: Rx status 
+Bit 11 downto 8: Tx footer status 
+Bit 7 downto 4: Tx payload status 
+Bit 3 downto 0: Tx header status 
+######
+Bit 31 downto 16: Rx header error counter 
+Bit 15 downto 0: Rx header fatal error counter 
+######
+Tx magic counter 
+######
+Tx start counter
+######
+Tx header counter
+######
+Tx footer counter 
+######
+Rx magic counter 
+######
+Rx start counter 
+######
+Rx header counter 
+######
+Rx footer counter
+######
+Bit 15 downto 12: Rx status 
+Bit 11 downto 8: Tx footer status 
+Bit 7 downto 4: Tx payload status 
+Bit 3 downto 0: Tx header status 
+######
+Bit 31 downto 16: Rx header error counter 
+Bit 15 downto 0: Rx header fatal error counter 
+######
+Tx magic counter 
+######
+Tx start counter
+######
+Tx header counter
+######
+Tx footer counter 
+######
+Rx magic counter 
+######
+Rx start counter 
+######
+Rx header counter 
+######
+Rx footer counter
+######
+rd_cnt_tx_0_hd 
+######
+rd_cnt_tx_0_dt 
+######
+wr_cnt_tx_0_hd 
+######
+wr_cnt_tx_0_dt
+######
+wr_cnt_rx_0_vch0_dt 
+######
+wr_cnt_rx_0_vch0_hd 
+######
+rd_cnt_rx_0_vch0_dt 
+######
+rd_cnt_rx_0_vch0_hd 
+######
+wr_cnt_rx_0_vch1_dt 
+######
+wr_cnt_rx_0_vch1_hd 
+######
+rd_cnt_rx_0_vch1_dt 
+######
+rd_cnt_rx_0_vch1_hd 
+######
+wr_cnt_tx_1_dt 
+######
+wr_cnt_tx_1_hd 
+######
+rd_cnt_tx_1_dt 
+######
+rd_cnt_tx_1_hd
+######
+wr_cnt_rx_1_vch0_dt 
+######
+wr_cnt_rx_1_vch0_hd 
+######
+rd_cnt_rx_1_vch0_dt 
+######
+rd_cnt_rx_1_vch0_hd 
+######
+wr_cnt_rx_1_vch1_dt 
+######
+wr_cnt_rx_1_vch1_hd 
+######
+rd_cnt_rx_1_vch1_dt 
+######
+rd_cnt_rx_1_vch1_hd
+######
+
