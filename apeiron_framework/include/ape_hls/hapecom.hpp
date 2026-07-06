@@ -7,7 +7,7 @@
 #include <ap_int.h>
 #include <hls_stream.h>
 
-#include "/apotto/home1/aliens/rossi/APEIRON/apeiron_framework/include/apenet_packet.h"
+#include "apenet_packet.h"
 #define PRAGMA_SUB(x) _Pragma (#x)
 #define DO_PRAGMA(x) PRAGMA_SUB(x)
 
@@ -20,8 +20,9 @@
 #endif
 
 
+//typedef ap_uint<256> word_t;
 typedef ap_uint<128> word_t;
-//typedef uint128_t word_t;
+
 typedef hls::stream<word_t> message_stream_t;
 typedef hls::stream<apenet_header_t> header_stream_t;
 typedef short channel_id_t;
@@ -39,38 +40,68 @@ apenet_header_t word_2_apenet(word_t wrd){
 		*/
 
 		apenet_header_t hd;
-		hd.s.virt_chan = wrd(127,123);
-		hd.s.proc_id = wrd(122,107);
-		hd.s.dest_x = wrd(106,101);
-		hd.s.dest_y = wrd(100,96);
-		hd.s.dest_z = wrd(95,91);
-		hd.s.intra_dest = wrd(90,87);
-		hd.s.reserved = wrd(86,86);
-		hd.s.out_of_lattice = wrd(85,85);
-		hd.s.packet_type = wrd(84,80);
-		hd.s.packet_size = wrd(79,66);
-		hd.s.dest_addr = wrd(65,18);
-		hd.s.num_of_hops = wrd(17,8);
-		hd.s.edac = wrd(7,0);
+		//hd.s.virt_chan = wrd(127,123);
+		//hd.s.proc_id = wrd(122,107);
+		//hd.s.dest_x = wrd(106,101);
+		//hd.s.dest_y = wrd(100,96);
+		//hd.s.dest_z = wrd(95,91);
+		//hd.s.intra_dest = wrd(90,87);
+		//hd.s.reserved = wrd(86,86);
+		//hd.s.out_of_lattice = wrd(85,85);
+		//hd.s.packet_type = wrd(84,80);
+		//hd.s.packet_size = wrd(79,66);
+		//hd.s.dest_addr = wrd(65,18);
+		//hd.s.num_of_hops = wrd(17,8);
+		//hd.s.edac = wrd(7,0);
+
+		hd.s.virt_chan = wrd(4,0);
+		hd.s.proc_id = wrd(20,5);
+		hd.s.dest_x = wrd(26,21);
+		hd.s.dest_y = wrd(31,27);
+		hd.s.dest_z = wrd(36,32);
+		hd.s.intra_dest = wrd(40,37);
+		hd.s.reserved = wrd(41,41);
+		hd.s.out_of_lattice = wrd(42,42);
+		hd.s.packet_type = wrd(47,43);
+		hd.s.packet_size = wrd(61,48);
+		hd.s.dest_addr_lo = wrd(63,62);
+		hd.s.dest_addr_hi = wrd(109,64);
+		hd.s.num_of_hops = wrd(119,110);
+		hd.s.edac = wrd(127,120);
 
 		return hd;
 }
 
 word_t apenet_2_word(apenet_header_t hd){
 		word_t header;
-		header(127,123) = hd.s.virt_chan;
-		header(122,107) = hd.s.proc_id;
-		header(106,101) = hd.s.dest_x;
-		header(100,96) = hd.s.dest_y;
-		header(95,91) = hd.s.dest_z;
-		header(90,87) = hd.s.intra_dest;
-		header(86,86) = hd.s.reserved;
-		header(85,85) = hd.s.out_of_lattice;
-		header(84,80) = hd.s.packet_type;
-		header(79,66) = hd.s.packet_size;
-		header(65,18) = hd.s.dest_addr;
-		header(17,8) = hd.s.num_of_hops;
-		header(7,0) = hd.s.edac;
+		header(4,0) = hd.s.virt_chan;
+		header(20,5) = hd.s.proc_id;
+		header(26,21) = hd.s.dest_x;
+		header(31,27) = hd.s.dest_y;
+		header(36,32) = hd.s.dest_z;
+		header(40,37) = hd.s.intra_dest;
+		header(41,41) = hd.s.reserved;
+		header(42,42) = hd.s.out_of_lattice;
+		header(47,43) = hd.s.packet_type;
+		header(61,48) = hd.s.packet_size;
+		header(63,62) = hd.s.dest_addr_lo;
+		header(109,64) = hd.s.dest_addr_hi;
+		header(119,110) = hd.s.num_of_hops;
+		header(127,120) = hd.s.edac;
+		
+		//header(127,123) = hd.s.virt_chan;
+		//header(122,107) = hd.s.proc_id;
+		//header(106,101) = hd.s.dest_x;
+		//header(100,96) = hd.s.dest_y;
+		//header(95,91) = hd.s.dest_z;
+		//header(90,87) = hd.s.intra_dest;
+		//header(86,86) = hd.s.reserved;
+		//header(85,85) = hd.s.out_of_lattice;
+		//header(84,80) = hd.s.packet_type;
+		//header(79,66) = hd.s.packet_size;
+		//header(65,18) = hd.s.dest_addr;
+		//header(17,8) = hd.s.num_of_hops;
+		//header(7,0) = hd.s.edac;
 		
 		return header;
 }
@@ -83,7 +114,10 @@ word_t forge_hdr(size_t size, int coord, task_id_t task_id, channel_id_t ch_id){
 			//tmp_hd.s.intra_dest = (coord>>16) & 0b1111;
 			tmp_hd.s.intra_dest = task_id;
 			tmp_hd.s.packet_size = size;//packet_size;
-			tmp_hd.s.dest_addr = 0xfafbfcfd;
+			//tmp_hd.s.dest_addr = 0xfafbfcfd;
+			unsigned dest_addr = 0xfafbfcfd;
+			tmp_hd.s.dest_addr_lo = dest_addr & 0x3;
+			tmp_hd.s.dest_addr_hi = dest_addr & 0xFFFFFFFFFFFC;
 			tmp_hd.s.proc_id = ch_id;
 		
 			word_t word_header = apenet_2_word(tmp_hd);
@@ -97,7 +131,8 @@ int receive(channel_id_t ch_id, word_t *buff,
 
 	word_t hdr = message_data_in[ch_id].read(); 
 
-	unsigned size = hdr.range(79,66);
+	//unsigned size = hdr.range(79,66);
+	unsigned size = hdr.range(61,48);
 
 	
        	unsigned nwords = (size & (sizeof(word_t)-1)) ? (size/sizeof(word_t)+1) : size/sizeof(word_t);
@@ -118,7 +153,8 @@ int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
 		message_stream_t message_data_in[N_INPUT_CHANNELS]){
 
 	word_t hdr = message_data_in[ch_id].read(); 
-	unsigned size_gu = hdr.range(79,66);
+	//unsigned size_gu = hdr.range(79,66);
+	unsigned size_gu = hdr.range(61,48);
 
 	
        	unsigned nwords_gu = (size_gu & (sizeof(word_t)-1)) ? (size_gu/sizeof(word_t)+1) : size_gu/sizeof(word_t);
@@ -142,7 +178,8 @@ int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
 	}
 	
 
-	word_t ftr = message_data_in[ch_id].read();  
+	word_t ftr = message_data_in[ch_id].read();
+      	hdrs[num_of_hdrs+1] = ftr;
 	
 	return nwords*sizeof(word_t);
 
@@ -153,7 +190,8 @@ int receive(channel_id_t ch_id, message_stream_t &kernel_stream,
 #pragma HLS inline off	
 	word_t hdr = message_data_in[ch_id].read(); 
 
-	unsigned size = hdr.range(79,66);
+	//unsigned size = hdr.range(79,66);
+	unsigned size = hdr.range(61,48);
 
 	
        	unsigned nwords = (size & (sizeof(word_t)-1)) ? (size/sizeof(word_t)+1) : size/sizeof(word_t);
@@ -217,7 +255,8 @@ int receive_streaming(channel_id_t ch_id, word_t &kernel_word, message_stream_t 
 	
 	if(payload_nwords[ch_id]==0) {
 		word_t hdr = message_data_in[ch_id].read(); 
-		payload_nwords[ch_id] = hdr.range(79,66)/sizeof(word_t);
+		//payload_nwords[ch_id] = hdr.range(79,66)/sizeof(word_t);
+		payload_nwords[ch_id] = hdr.range(61,48)/sizeof(word_t);
 		//v_nwords = payload_nwords[ch_id];
 		word_t word = message_data_in[ch_id].read();
 		kernel_word = word;
@@ -254,7 +293,10 @@ size_t send(word_t *buff, size_t size, int coord,
 			//tmp_hd.s.intra_dest = (coord>>16) & 0b1111;
 			tmp_hd.s.intra_dest = task_id;
 			tmp_hd.s.packet_size = size;//packet_size;
-			tmp_hd.s.dest_addr = 0xfafbfcfd;
+			unsigned dest_addr = 0xfafbfcfd;
+			//tmp_hd.s.dest_addr = 0xfafbfcfd;
+			tmp_hd.s.dest_addr_lo = dest_addr & 0x3;
+			tmp_hd.s.dest_addr_hi = dest_addr & 0xFFFFFFFFFFFC;
 			tmp_hd.s.proc_id = ch_id;
 			
 			if(eth) tmp_hd.s.packet_type = 0b00010;
@@ -272,7 +314,10 @@ size_t send(word_t *buff, size_t size, int coord,
 			} 
 		
 			apenet_header_t tmp_ftr = {0};
-			tmp_ftr.s.dest_addr = 0xaaaeabac;
+			//tmp_ftr.s.dest_addr = 0xaaaeabac;
+			dest_addr = 0xaaaeabac;
+			tmp_ftr.s.dest_addr_lo = dest_addr & 0x3;
+			tmp_ftr.s.dest_addr_hi = dest_addr & 0xFFFFFFFFFFFC;
 			tmp_ftr.s.edac = 0x99;
 		
 			word_t tmp_footer = apenet_2_word(tmp_ftr);
@@ -299,11 +344,14 @@ size_t send_gu(word_t *buff, size_t size, word_t *hdrs,
 			num_of_hdrs--;
 
 			//cambio size tenendo conto degli hdrs
-			size_t new_size = size+num_of_hdrs+1;
-			acc_hdr.range(79,66) = new_size;
-			channel_id_t ch_id = acc_hdr.range(122,107);
+			size_t new_size = size+(num_of_hdrs+1)*sizeof(word_t);
+			//acc_hdr.range(79,66) = new_size;
+			acc_hdr.range(61,48) = new_size;
+			//channel_id_t ch_id = acc_hdr.range(122,107);
+			channel_id_t ch_id = acc_hdr.range(20,50);
 
-			if(eth) acc_hdr.range(84,80) = 0b00010;
+			//if(eth) acc_hdr.range(84,80) = 0b00010;
+			if(eth) acc_hdr.range(47,43) = 0b00010;
 		
 			message_data_out[ch_id].write(acc_hdr); 
 
@@ -326,11 +374,13 @@ size_t send_gu(word_t *buff, size_t size, word_t *hdrs,
 				message_data_out[ch_id].write(hdrs[i+1]);
 			}
 
-			apenet_header_t tmp_ftr = {0};
+			/*apenet_header_t tmp_ftr = {0};
 			tmp_ftr.s.dest_addr = 0xaaaeabac;
 			tmp_ftr.s.edac = 0x99;
 		
 			word_t tmp_footer = apenet_2_word(tmp_ftr);
+			*/
+			word_t tmp_footer = hdrs[num_of_hdrs+2];
 			message_data_out[ch_id].write(tmp_footer); //footer 
 		
 			return size;
@@ -416,7 +466,10 @@ size_t send_streaming(message_stream_t &kernel_stream, size_t size, int coord,
 		//tmp_hd.s.intra_dest = (coord>>16) & 0b1111;
 		tmp_hd.s.intra_dest = task_id;
 		tmp_hd.s.packet_size = size;//packet_size;
-		tmp_hd.s.dest_addr = 0xfafbfcfd;
+		//tmp_hd.s.dest_addr_lo = 0xfafbfcfd;
+		unsigned dest_addr = 0xfafbfcfd;
+		tmp_hd.s.dest_addr_lo = dest_addr & 0x3;
+		tmp_hd.s.dest_addr_hi = dest_addr & 0xFFFFFFFFFFFC;
 		tmp_hd.s.proc_id = ch_id;
 		
 		word_t tmp_header = apenet_2_word(tmp_hd);

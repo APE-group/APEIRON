@@ -161,13 +161,15 @@ int main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	xrt::device device(0);
+	/*
 	xrt::device device;
 	bool device_found = false;
 	for (unsigned d=0; d<ndevices; ++d) {
 		device = xrt::device(d);
-		if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_base_2") { // TODO: board name as command line argument
+		//if (device.get_info<xrt::info::device::name>() == "xilinx_u200_gen3x16_xdma_base_2") { // TODO: board name as command line argument
 	
-		//if (device.get_info<xrt::info::device::name>() == "xilinx_u280_gen3x16_xdma_base_1") { // TODO: board name as command line argument
+		if (device.get_info<xrt::info::device::name>() == "xilinx_u280_gen3x16_xdma_base_1") { // TODO: board name as command line argument
 			device_found = true;
 			break;
 		}
@@ -177,6 +179,7 @@ int main(int argc, char** argv)
 		std::cerr << "Device xilinx_u200_gen3x16_xdma_base_2 not found\n";
 		exit(EXIT_FAILURE);
 	}
+	*/
 	
 	if(!quiet){
 		std::cout << "Device name: " << device.get_info<xrt::info::device::name>() << std::endl;
@@ -192,20 +195,8 @@ int main(int argc, char** argv)
 	xrt::ip kswitch(device, uuid, "TextaRossa_switch"); //ip Switch handle 
 	kswitch_thread = &kswitch; //ip handle for parallel thread
 	
-	xrt::kernel krnl_sender_receiver; //kernel handle
-	xrt::kernel krnl_sender_receiver2;
-
-  if(start_port==0) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_1}");
-	else if(start_port==1) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_2}");
-	else if(start_port==2) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_3}");
-	else if(start_port==3) krnl_sender_receiver = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_4}");
-
-  if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) ){
-  		if(dest_task_id==0) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_1}");
-  		else if(dest_task_id==1) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_2}");
-  		else if(dest_task_id==2) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_3}");
-  		else if(dest_task_id==3) krnl_sender_receiver2 = xrt::kernel(device, uuid, "krnl_sr:{krnl_sr_4}");
-  }
+	xrt::kernel krnl_net_gu; //kernel handle
+	krnl_net_gu = xrt::kernel(device, uuid, "net_krnl:{net_krnl_1}");
 	
 	range.end();
 	events.mark("Context created, Xclbin flashed and kernel instantiated");
@@ -214,13 +205,13 @@ int main(int argc, char** argv)
 	range.start("Phase 2","Buffer creation");
 
 	//Receive buffer intialization
-	xrt::bo recv_buffer(device, buf_size, krnl_sender_receiver.group_id(6));
+	xrt::bo recv_buffer(device, buf_size, krnl_net_gu.group_id(4));
 	stream_data_t *recv_buffer_map = recv_buffer.map<stream_data_t*>();
 	memset(recv_buffer_map, 0, buf_size);
 
 
 	//Send buffer initialization
-	xrt::bo send_buffer(device, packet_size, krnl_sender_receiver.group_id(5));
+	xrt::bo send_buffer(device, packet_size, krnl_net_gu.group_id(3));
 	stream_data_t *send_buffer_map = send_buffer.map<stream_data_t*>();
  	memset(send_buffer_map, 0, packet_size);
 	for (unsigned i=0; i < packet_size/sizeof(stream_data_t); ++i) {
@@ -229,7 +220,7 @@ int main(int argc, char** argv)
   	}
  	
 	if(!quiet){
-		for (int i=0;i<200;i++){
+		for (int i=0;i<16;i++){
 			std::cout << "reg: " << i << " [0x" << std::hex << i*4 << "] = " << std::dec <<  kswitch.read_register(i*4) << std::dec << "\n";
 		}
 		std::printf("Press a key to continue\n");
@@ -272,40 +263,17 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	if (INTERNAL_GENERATOR) {
-               unsigned tmp = npackets + (packet_size << 16);
-               kswitch.write_register(14*4, tmp);
-
-               kswitch.write_register(16*4, 0x00000001);
-               std::printf("Starting packet generator ...\n");
-
-	       if(local_coord>0) kswitch.write_register(12*4, 0x00000100);
-               else kswitch.write_register(12*4, 0x00000101);
-
-               //kswitch.write_register(12*4, 0x00000101);
-
-               sleep(5);
-               std::printf("Test ok: %x\n",kswitch.read_register(20*4)); // Tet_ok bi
-               std::printf("Clock cycle: %u\n", kswitch.read_register(22*4));
-               exit(0);
-       }
-	else{
-
 	if(!quiet) std::printf("Running receiver kernel ...\n");
 	gettimeofday(&startTime,NULL);
-	if(bram==0 && status!=3) send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+	if(bram==0) send_buffer.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 	
-	xrt::run krnl_sender_receiver_run;
-	xrt::run krnl_sender_receiver_run2;
-	if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) )	krnl_sender_receiver_run2 = krnl_sender_receiver2(xdest, start_port, npackets, npackets, packet_size, NULL, NULL, 1, 1);
-	
-	if(local_coord==0 || xdest==1) krnl_sender_receiver_run = krnl_sender_receiver(xdest, dest_task_id, npackets, npackets, packet_size, send_buffer, recv_buffer, bram, status);
+	xrt::run krnl_net_gu_run;	
+	krnl_net_gu_run = krnl_net_gu(4, npackets, packet_size, send_buffer, recv_buffer, bram);
 
 	if(!quiet) std::printf("Waiting for receiver kernel to complete ...\n");
 	
-	if(local_coord>=1 || (xdest==0 && start_port!=dest_task_id) ) krnl_sender_receiver_run2.wait();
-	if(local_coord==0 || xdest==1) krnl_sender_receiver_run.wait();
-	if(bram==0 && status!=2) recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+	krnl_net_gu_run.wait();
+	if(bram==0) recv_buffer.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 	gettimeofday(&endTime,NULL);
 	if(!quiet){
 		std::printf("Printing output:\n");
@@ -315,13 +283,9 @@ int main(int argc, char** argv)
 	}
 
 	double elapsedTime = elapsed(startTime,endTime);
-	if(local_coord == 0){
-		//std::cout<<"Bandwidth: "<<(npackets*packet_size)/elapsedTime<<" MB/s"<<std::endl;
-		std::cout<<packet_size<<" \t "<<elapsedTime/(2*npackets)<<std::endl;
-		//std::cout<<"Elapsed time: "<<elapsedTime<<" us"<<std::endl;
-	}
-	else std::cout<<"Packets pipelined"<<std::endl;
-	}
+	//std::cout<<"Bandwidth: "<<(npackets*packet_size)/elapsedTime<<" MB/s"<<std::endl;
+	std::cout<<packet_size<<" \t "<<elapsedTime/(2*npackets)<<std::endl;
+	//std::cout<<"Elapsed time: "<<elapsedTime<<" us"<<std::endl;
 	
 	range.end();
 	events.mark("End Execution");

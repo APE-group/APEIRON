@@ -9,7 +9,7 @@
 #define MAX_WORDS 5120
 
 extern "C" {
-typedef ap_uint<128> word_t;
+//typedef ap_uint<256> word_t;
 
 void acc_krnl(message_stream_t message_data_out[N_INPUT_CHANNELS], message_stream_t message_data_in[N_OUTPUT_CHANNELS]) {
 #pragma HLS INTERFACE ap_ctrl_none port=return
@@ -20,11 +20,8 @@ void acc_krnl(message_stream_t message_data_out[N_INPUT_CHANNELS], message_strea
 	
 	//1by1 LATENCY MODE
         word_t hdrs_local_buff[MAX_WORDS];
-	#pragma HLS ARRAY_PARTITION variable=hdrs_local_buff type=complete
         word_t dt_recv_buff[MAX_WORDS];
-	#pragma HLS ARRAY_PARTITION variable=dt_recv_buff type=complete
         word_t dt_send_buff[MAX_WORDS];
-	#pragma HLS ARRAY_PARTITION variable=dt_send_buff type=complete
 	
 	word_t accum = 0;
 
@@ -38,7 +35,7 @@ void acc_krnl(message_stream_t message_data_out[N_INPUT_CHANNELS], message_strea
 		dt_send_buff[i] = accum;
 	}
         
-	send_gu(dt_send_buff, size, hdrs_local_buff,message_data_out);
+	send_gu(dt_send_buff, size, hdrs_local_buff, message_data_out);
 	
 }
 }

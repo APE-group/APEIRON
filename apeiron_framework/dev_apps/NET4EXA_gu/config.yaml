@@ -1,5 +1,6 @@
 kernels:
 
+
   - name: net_krnl_1
     input_channels: 1
     output_channels: 1

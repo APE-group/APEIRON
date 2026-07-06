@@ -10,7 +10,7 @@
 
 
 extern "C" {
-typedef ap_uint<128> word_t;
+//typedef ap_uint<256> word_t;
 
 void net_krnl(int num_of_hdrs, int npackets, int packet_size, word_t *mem_in, word_t *mem_out, int mem_usage_test, 
 message_stream_t message_data_out[N_INPUT_CHANNELS], message_stream_t message_data_in[N_OUTPUT_CHANNELS]) {
@@ -34,12 +34,17 @@ message_stream_t message_data_out[N_INPUT_CHANNELS], message_stream_t message_da
 		for (int i=0; i<npackets; ++i){
 		//Communication library APIs
 			word_t local_hdrs[MAX_WORDS];
-			#pragma HLS ARRAY_PARTITION variable=local_hdrs type=complete
 			local_hdrs[0] = num_of_hdrs;
 			for(int j=1; j<=num_of_hdrs; j++){
+			#pragma HLS PIPELINE II=1
 				task_id = j;
-				local_hdrs[j] = forge_hdr(packet_size, coord, task_id, ch_id); 
+				local_hdrs[j] = forge_hdr(packet_size, coord, task_id%4, ch_id); 
 			}
+			// Explicitly initialize the 128-bit constants using the string constructor
+			//local_hdrs[num_of_hdrs]   = ap_uint<128>("0x00000002000000000040020080e00000", 16);
+			local_hdrs[num_of_hdrs+1] = ap_uint<128>("0x000000000cf7a00000000060ffff0042", 16);
+			//local_hdrs[num_of_hdrs] = 0x00000002000000000040020080e00000; 
+			//local_hdrs[num_of_hdrs+1] = 0x000000000cf7a00000000060ffff0042;
 			send_gu(mem_in+stride, packet_size, local_hdrs,message_data_out); 
 			size = receive_gu(ch_id, mem_out+stride, local_hdrs, message_data_in);
 			stride += size/sizeof(word_t);
@@ -50,24 +55,22 @@ message_stream_t message_data_out[N_INPUT_CHANNELS], message_stream_t message_da
 		//Communication library APIs
 			//Local buffers for BRAM test
 			word_t local_send[MAX_WORDS]; 
-			#pragma HLS ARRAY_PARTITION variable=local_send type=complete
 			word_t local_hdrs[MAX_WORDS];
-			#pragma HLS ARRAY_PARTITION variable=local_hdrs type=complete
 			word_t local_receive[MAX_WORDS];
-			#pragma HLS ARRAY_PARTITION variable=local_receive type=complete
 			
 			//Send buffer initialization
 			for(int j=0; j<nword; j++) {
+			#pragma HLS PIPELINE II=1
 				local_send[j]=j;
 			}
 
 			local_hdrs[0] = num_of_hdrs;
 			for(int j=1; j<=num_of_hdrs; j++){
 				task_id = j;
-				local_hdrs[j] = forge_hdr(packet_size, coord, task_id, ch_id); 
+				local_hdrs[j] = forge_hdr(packet_size, coord, task_id%4, ch_id); 
 			}
 
-			send_gu(local_in, packet_size, local_hdrs,message_data_out); 
+			send_gu(local_send, packet_size, local_hdrs,message_data_out); 
 			size = receive_gu(ch_id, local_receive+stride, local_hdrs, message_data_in);
 			stride += size/sizeof(word_t);
 		}

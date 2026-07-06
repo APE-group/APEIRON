@@ -81,7 +81,7 @@ void @NAME@(header_stream_t &fifo_hdr_in,message_stream_t &fifo_data_in/*,header
 //#pragma HLS INTERFACE axis port=fifo_hdr_out
 #pragma HLS INTERFACE axis port=fifo_data_out
 #pragma HLS DATAFLOW
-    ape::dispatcher_template<N_OUTPUT_CHANNEL, 128, (512+1024)>(fifo_hdr_in, fifo_data_in, /*fifo_hdr_out,*/ fifo_data_out);
+    ape::dispatcher_template<N_OUTPUT_CHANNEL, 128, 4096>(fifo_hdr_in, fifo_data_in, /*fifo_hdr_out,*/ fifo_data_out);
 }
 '''.replace('@NCHAN@', str(nchan)).replace('@NAME@', 'dispatcher_'+str(nport))
 
@@ -96,11 +96,10 @@ def generate_aggregator(nport, nchan, dest_dir="hw_hls/autogen"):
     out_str = '''
 #include "ape_hls/aggregator.hpp"
 #define N_INPUT_CHANNEL @NCHAN@
-void @NAME@(unsigned nevents /*header_stream_t fifo_hdr_in[N_INPUT_CHANNEL]*/,message_stream_t fifo_data_in[N_INPUT_CHANNEL],header_stream_t &fifo_hdr_out,message_stream_t &fifo_data_out){
+void @NAME@(message_stream_t fifo_data_in[N_INPUT_CHANNEL],header_stream_t &fifo_hdr_out,message_stream_t &fifo_data_out){
 #pragma HLS INTERFACE ap_ctrl_none port=return
-//#pragma HLS INTERFACE axis port=fifo_hdr_in
 #pragma HLS INTERFACE axis port=fifo_data_in
-    ape::aggregator_template<N_INPUT_CHANNEL>(nevents,/*fifo_hdr_in,*/ fifo_data_in, fifo_hdr_out, fifo_data_out);
+    ape::aggregator_template<N_INPUT_CHANNEL>( fifo_data_in, fifo_hdr_out, fifo_data_out);
 }
 '''.replace('@NCHAN@', str(nchan)).replace('@NAME@', 'aggregator_'+str(nport))
 
@@ -159,11 +158,10 @@ clk_freq_domain0 = 100
 clk_freq_domain1 = 100
 
 if "freq0" in config:
-    clk_freq_domain0 = config['freq0'] 
+    clk_freq_domain0 = config['freq0']
 
 if "freq1" in config:
     clk_freq_domain1 = config['freq1'] 
-
 
 if args.list_autogen:
         one=0

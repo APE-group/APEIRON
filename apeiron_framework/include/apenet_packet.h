@@ -4,11 +4,11 @@
 #ifndef __APENET_PACKET_H__
 #define __APENET_PACKET_H__
 
+#include <cstdint>
 extern "C" {
 
 typedef union {
-	struct __attribute__((packed)) {	
-
+	struct __attribute__((packed)) {
 		unsigned long virt_chan      :  5;
 		unsigned long proc_id        : 16;
 		unsigned long dest_x         :  6;
@@ -19,18 +19,19 @@ typedef union {
 		unsigned long out_of_lattice :  1;
 		unsigned long packet_type    :  5;
 		unsigned long packet_size    : 14;
-		unsigned long dest_addr      : 48;
+		//unsigned long dest_addr      : 48;
+		unsigned long dest_addr_lo   : 2;
+		unsigned long dest_addr_hi   : 46;
 		unsigned long num_of_hops    : 10;
 		unsigned long edac           :  8;
-
 	} s;
-	uint32_t l[4];
-	uint64_t u[2];
+	uint32_t l[8];
+	uint64_t u[4];
 } apenet_header_t;
 
 typedef union {
-	uint32_t l[4];
-	uint64_t u[2];
+	uint32_t l[8];
+	uint64_t u[4];
 } apenet_footer_t;
 
 }
