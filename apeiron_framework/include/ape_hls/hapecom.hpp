@@ -20,8 +20,8 @@
 #endif
 
 
-//typedef ap_uint<256> word_t;
-typedef ap_uint<128> word_t;
+typedef ap_uint<256> word_t;
+//typedef ap_uint<128> word_t;
 
 typedef hls::stream<word_t> message_stream_t;
 typedef hls::stream<apenet_header_t> header_stream_t;
