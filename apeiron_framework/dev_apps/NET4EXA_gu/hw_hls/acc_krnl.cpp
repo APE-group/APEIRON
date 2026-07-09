@@ -4,6 +4,7 @@
 #include "ape_hls/hapecom.hpp"
 
 
+
 #define N_OUTPUT_CHANNELS 1
 #define N_INPUT_CHANNELS 1
 #define MAX_WORDS 5120

@@ -148,7 +148,7 @@ int receive(channel_id_t ch_id, word_t *buff,
 
 }
 
-
+/*
 int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
 		message_stream_t message_data_in[N_INPUT_CHANNELS]){
 
@@ -164,13 +164,13 @@ int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
 	unsigned num_of_hdrs = word_num_of_hdrs.range(31,0);
 	unsigned nwords=nwords_gu-num_of_hdrs-1;
 	
-/*PAYLOAD*/
+//PAYLOAD
 	for (unsigned i = 0; i < nwords; ++i){ 
 	#pragma HLS pipeline
 		buff[i] = message_data_in[ch_id].read(); 
 	}
 
-/*HEADERS*/
+//HEADERS
 	hdrs[0] = word_num_of_hdrs;
 	for (unsigned i = 1; i <= num_of_hdrs; ++i){ 
 	#pragma HLS pipeline
@@ -184,6 +184,55 @@ int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
 	return nwords*sizeof(word_t);
 
 }
+*/
+
+#include <hls_print.h> // Required header for HLS printing
+
+int receive_gu(channel_id_t ch_id, word_t *buff, word_t *hdrs,
+               message_stream_t message_data_in[N_INPUT_CHANNELS]){
+  
+        word_t hdr = message_data_in[ch_id].read();
+        unsigned size_gu = hdr.range(61,48);
+
+        unsigned nwords_gu = (size_gu & (sizeof(word_t)-1)) ? (size_gu/sizeof(word_t)+1) : size_gu/sizeof(word_t);
+  
+        word_t word_num_of_hdrs = message_data_in[ch_id].read();
+        unsigned num_of_hdrs = word_num_of_hdrs.range(31,0);
+        
+        // 1. Calculate underflow condition as a data flag (0 = OK, 1 = Error)
+        unsigned is_underflow = (nwords_gu <= (num_of_hdrs + 1)) ? 1 : 0;
+
+        // 2. Compute nwords using a standard ternary operator (synthesizes safely to a MUX)
+        unsigned nwords = (is_underflow == 0) ? (nwords_gu - num_of_hdrs - 1) : 0;
+
+        // 3. Print everything in one clean log line. No false branching triggers.
+        hls::print("[HLS-DEBUG] Channel: %u ", (unsigned)ch_id);
+        hls::print("| size_gu: %u ",size_gu);
+        hls::print("| nwords_gu: %u ",nwords_gu);
+        hls::print("| num_of_hdrs: %u\n",num_of_hdrs);
+  
+
+        /*PAYLOAD*/
+        for (unsigned i = 0; i < nwords; ++i){
+        #pragma HLS pipeline
+                buff[i] = message_data_in[ch_id].read();
+        }
+  
+        /*HEADERS*/
+        hdrs[0] = word_num_of_hdrs;
+        for (unsigned i = 1; i <= num_of_hdrs; ++i){
+        #pragma HLS pipeline
+                hdrs[i] = message_data_in[ch_id].read();
+        }
+  
+        word_t ftr = message_data_in[ch_id].read();
+        hdrs[num_of_hdrs+1] = ftr;
+  
+        return nwords*sizeof(word_t);
+}
+
+
+
 
 int receive(channel_id_t ch_id, message_stream_t &kernel_stream, 
 		message_stream_t message_data_in[N_INPUT_CHANNELS]){

@@ -1,6 +1,6 @@
-#PLATFORM ?= xilinx_u200_gen3x16_xdma_2_202110_1
-PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
-XCLBIN_NAME ?= test_hw_TP_bram.xclbin
+PLATFORM ?= xilinx_u200_gen3x16_xdma_2_202110_1
+#PLATFORM ?= xilinx_u280_gen3x16_xdma_1_202211_1
+XCLBIN_NAME ?= test_hw_NET4EXA.xclbin
 #TARGET ?= hw
 TARGET ?= hw_emu
 AUTOGEN_YAML ?= config.yaml
@@ -9,8 +9,9 @@ AUTOGEN_YAML ?= config.yaml
 #TARGET_APP ?= CNN_apeiron_preprocessing_node
 #TARGET_APP ?= image_processing
 #TARGET_APP ?= lat_bw
-TARGET_APP ?= EIC_apeiron_TP
-#TARGET_APP ?= EIC_apeiron_DAMI
+#TARGET_APP ?= EIC_apeiron_TP
+#TARGET_APP ?= EIC_apeiron_DAM
+TARGET_APP ?= NET4EXA_gu
 
 LDFLAGS += -L$(XILINX_XRT)/lib -lxrt_coreutil -pthread
 CXXFLAGS += -g -std=c++1y -I$(XILINX_XRT)/include -Wall
