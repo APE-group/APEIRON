@@ -25,13 +25,13 @@ typedef union {
 		unsigned long num_of_hops    : 10;
 		unsigned long edac           :  8;
 	} s;
-	uint32_t l[4];
-	uint64_t u[2];
+	uint32_t l[8];
+	uint64_t u[4];
 } apenet_header_t;
 
 typedef union {
-	uint32_t l[4];
-	uint64_t u[2];
+	uint32_t l[8];
+	uint64_t u[4];
 } apenet_footer_t;
 
 }
